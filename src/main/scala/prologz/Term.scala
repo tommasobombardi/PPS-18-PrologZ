@@ -3,16 +3,12 @@ package prologz
 object Term {
 
   sealed trait Term { def toProlog: String }
-  sealed trait Atom extends Term { def name: String; def apply(args: Term*): Struct }
+  sealed trait Atom extends Term { def name: String }
   sealed trait Int extends Term { def value: scala.Int }
   sealed trait Struct extends Term { def name: String; def args: List[Term] }
   sealed trait Variable extends Term { def name: String }
 
   private case class AtomImpl(override val name: String) extends Atom {
-    override def apply(args: Term*): Struct = {
-      require(args.nonEmpty, "Body of a compound term must be not empty")
-      StructImpl(name, args.toList)
-    }
     override def toProlog: String = name
   }
 
@@ -29,11 +25,12 @@ object Term {
   }
 
   object Struct {
-    def apply(name: String): Atom = {
-      require(name.nonEmpty, "String representing term must be not empty")
-      require(name.forall(c => c.isLetter), "String representing term must contain only letters")
-      require(name.charAt(0).isLower, "String representing term must start with a lowercase letter")
-      AtomImpl(name)
+    def apply(name: String)(args: Term*): Struct = {
+      require(name.nonEmpty, "String representing compound term must be not empty")
+      require(name.forall(c => c.isLetter), "String representing compound term must contain only letters")
+      require(name.charAt(0).isLower, "String representing compound term must start with a lowercase letter")
+      require(args.nonEmpty, "Argument list of compound term must be not empty")
+      StructImpl(name, args.toList)
     }
   }
 
