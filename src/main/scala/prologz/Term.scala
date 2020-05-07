@@ -29,7 +29,7 @@ object Term {
       require(name.nonEmpty, "String representing compound term must be not empty")
       require(name.forall(c => c.isLetter), "String representing compound term must contain only letters")
       require(name.charAt(0).isLower, "String representing compound term must start with a lowercase letter")
-      require(args.nonEmpty, "Argument list of compound term must be not empty")
+      require(args.nonEmpty, "Argument list in compound term must be not empty")
       StructImpl(name, args.toList)
     }
   }
