@@ -12,15 +12,12 @@ object Term {
   private case class AtomImpl(override val name: String) extends Atom {
     override def toProlog: String = name
   }
-
   private case class IntImpl(override val value: scala.Int) extends Int {
     override def toProlog: String = value.toString
   }
-
   private case class StructImpl(override val name: String, override val args: List[Term]) extends Struct {
     override def toProlog: String = name + "(" + args.map(_.toProlog).mkString(",") + ")"
   }
-
   private case class VariableImpl(override val name: String) extends Variable {
     override def toProlog: String = name
   }
