@@ -24,16 +24,20 @@ object Term {
 
   object Struct {
     //noinspection FindEmptyCheck
-    def apply(name: String)(args: Term*): ValidationNel[IllegalArgumentException, Struct] = {
+    def apply(name: String)(args: ValidationNel[IllegalArgumentException, Term]*): ValidationNel[IllegalArgumentException, Struct] = {
       val nameVal1: ValidationNel[IllegalArgumentException, String] =
         if(name.isEmpty) new IllegalArgumentException("String representing compound term must be not empty").failureNel else name.successNel
       val nameVal2: ValidationNel[IllegalArgumentException, String] =
         if(name.find(!_.isLetter).isDefined) new IllegalArgumentException("String representing compound term must contain only letter").failureNel else name.successNel
       val nameVal3: ValidationNel[IllegalArgumentException, String] =
         if(name.nonEmpty && name.charAt(0).isUpper) new IllegalArgumentException("String representing compound term must start with a lowercase letter").failureNel else name.successNel
-      val argsVal: ValidationNel[IllegalArgumentException, Seq[Term]] =
-        if(args.isEmpty) new IllegalArgumentException("Argument list in compound term must be not empty").failureNel else args.successNel
-      (nameVal1 |@| nameVal2 |@| nameVal3 |@| argsVal)((name, _, _, args) => StructImpl(name, args.toList))
+
+      val argsVal: ValidationNel[IllegalArgumentException, List[Term]] =
+
+        if(args.isEmpty) new IllegalArgumentException("Argument list in compound term must be not empty").failureNel
+        else args.foldRight(List.empty[Term].successNel[IllegalArgumentException])((el: ValidationNel[IllegalArgumentException, Term], acc: ValidationNel[IllegalArgumentException, List[Term]]) => (acc |@| el)((a: List[Term], b: Term) => b :: a))
+
+        (nameVal1 |@| nameVal2 |@| nameVal3 |@| argsVal)((name, _, _, args) => StructImpl(name, args))
     }
   }
 
