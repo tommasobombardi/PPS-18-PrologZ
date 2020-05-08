@@ -18,7 +18,7 @@ object Term {
   }
 
   private case class StructImpl(override val name: String, override val args: List[Term]) extends Struct {
-    override def toProlog: String = name + "(" + args.map(t => t.toProlog).mkString(",") + ")"
+    override def toProlog: String = name + "(" + args.map(_.toProlog).mkString(",") + ")"
   }
 
   private case class VariableImpl(override val name: String) extends Variable {
@@ -26,11 +26,12 @@ object Term {
   }
 
   object Struct {
+    //noinspection FindEmptyCheck
     def apply(name: String)(args: Term*): ValidationNel[IllegalArgumentException, Struct] = {
       val nameVal1: ValidationNel[IllegalArgumentException, String] =
         if(name.isEmpty) new IllegalArgumentException("String representing compound term must be not empty").failureNel else name.successNel
       val nameVal2: ValidationNel[IllegalArgumentException, String] =
-        if(name.exists(c => !c.isLetter)) new IllegalArgumentException("String representing compound term must contain only letter").failureNel else name.successNel
+        if(name.find(!_.isLetter).isDefined) new IllegalArgumentException("String representing compound term must contain only letter").failureNel else name.successNel
       val nameVal3: ValidationNel[IllegalArgumentException, String] =
         if(name.nonEmpty && name.charAt(0).isUpper) new IllegalArgumentException("String representing compound term must start with a lowercase letter").failureNel else name.successNel
       val argsVal: ValidationNel[IllegalArgumentException, Seq[Term]] =
@@ -39,12 +40,15 @@ object Term {
     }
   }
 
-  implicit def fromString(name: String): Term = {
-    require(name.nonEmpty, "String representing term must be not empty")
-    require(name.forall(c => c.isLetter), "String representing term must contain only letters")
-    if(name.charAt(0).isLower) AtomImpl(name) else VariableImpl(name)
+  //noinspection FindEmptyCheck
+  implicit def fromString(name: String): ValidationNel[IllegalArgumentException, Term] = {
+    val nameVal1: ValidationNel[IllegalArgumentException, String] =
+      if(name.isEmpty) new IllegalArgumentException("String representing term must be not empty").failureNel else name.successNel
+    val nameVal2: ValidationNel[IllegalArgumentException, String] =
+      if(name.find(!_.isLetter).isDefined) new IllegalArgumentException("String representing term must contain only letter").failureNel else name.successNel
+    (nameVal1 |@| nameVal2)((name, _) => if(name.charAt(0).isLower) AtomImpl(name) else VariableImpl(name))
   }
 
-  implicit def fromInt(value: scala.Int): Term = IntImpl(value)
+  implicit def fromInt(value: scala.Int): ValidationNel[IllegalArgumentException, Term] = IntImpl(value).asInstanceOf[Term].successNel
 
 }
