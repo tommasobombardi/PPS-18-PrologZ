@@ -1,4 +1,5 @@
-package prologz
+import scalaz._
+import Scalaz._
 
 object Term {
 
@@ -25,12 +26,17 @@ object Term {
   }
 
   object Struct {
-    def apply(name: String)(args: Term*): Struct = {
-      require(name.nonEmpty, "String representing compound term must be not empty")
-      require(name.forall(c => c.isLetter), "String representing compound term must contain only letters")
-      require(name.charAt(0).isLower, "String representing compound term must start with a lowercase letter")
-      require(args.nonEmpty, "Argument list in compound term must be not empty")
-      StructImpl(name, args.toList)
+    def apply(name: String)(args: Term*): Validation[IllegalArgumentException, Struct] = {
+
+      if (name.isEmpty) return new IllegalArgumentException("String representing compound term must be not empty").failure
+
+      if (name.exists(c => !c.isLetter)) return new IllegalArgumentException("String representing compound term must contain only letters").failure
+
+      if (name.charAt(0).isUpper) return new IllegalArgumentException("String representing compound term must start with a lowercase letter").failure
+
+      if (args.isEmpty) return new IllegalArgumentException("Argument list in compound term must be not empty").failure
+
+      StructImpl(name, args.toList).asInstanceOf[Struct].success[IllegalArgumentException]
     }
   }
 
