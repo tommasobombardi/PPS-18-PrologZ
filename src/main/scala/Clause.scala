@@ -19,6 +19,21 @@ object Clause {
     override def toProlog: String = head.toProlog.dropRight(1) + ":-" + body.map(_.toProlog.dropRight(1)).mkString(",") + "."
   }
 
+  object Predicate {
+    def apply(name: String): ValidationNel[IllegalArgumentException, Predicate] = {
+      val nameVal1: ValidationNel[IllegalArgumentException, String] =
+        if(name.nonEmpty) name.successNel
+        else new IllegalArgumentException("An empty string is not valid to represent a predicate").failureNel
+      val nameVal2: ValidationNel[IllegalArgumentException, String] =
+        if(name.forall(_.isLetter)) name.successNel
+        else new IllegalArgumentException("String '" + name + "' is not valid to represent a predicate, because it doesn't contain only letters").failureNel
+      val nameVal3: ValidationNel[IllegalArgumentException, String] =
+        if(name.nonEmpty && name.charAt(0).isLower) name.successNel
+        else new IllegalArgumentException("String '" + name + "' is not valid to represent a predicate, because it doesn't start with a lowercase letter").failureNel
+      (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => PredicateImpl(name))
+    }
+  }
+
   implicit class RichPredicate(base: ValidationNel[IllegalArgumentException, Predicate]) {
     def apply(args: ValidationNel[IllegalArgumentException, Term]*): ValidationNel[IllegalArgumentException, Fact] = {
       val argsVal: ValidationNel[IllegalArgumentException, List[Term]] =
@@ -33,21 +48,6 @@ object Clause {
         if(facts.nonEmpty) facts.foldLeft(List.empty[Fact].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc))
         else new IllegalArgumentException("Body (namely the list of facts) of the rule must be not empty").failureNel
       (base |@| factsVal)((head, body) => RuleImpl(head, body))
-    }
-  }
-
-  object Predicate {
-    def apply(name: String): ValidationNel[IllegalArgumentException, Predicate] = {
-      val nameVal1: ValidationNel[IllegalArgumentException, String] =
-        if(name.nonEmpty) name.successNel
-        else new IllegalArgumentException("An empty string is not valid to represent a predicate").failureNel
-      val nameVal2: ValidationNel[IllegalArgumentException, String] =
-        if(name.forall(_.isLetter)) name.successNel
-        else new IllegalArgumentException("String '" + name + "' is not valid to represent a predicate, because it doesn't contain only letters").failureNel
-      val nameVal3: ValidationNel[IllegalArgumentException, String] =
-        if(name.nonEmpty && name.charAt(0).isLower) name.successNel
-        else new IllegalArgumentException("String '" + name + "' is not valid to represent a predicate, because it doesn't start with a lowercase letter").failureNel
-      (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => PredicateImpl(name))
     }
   }
 
