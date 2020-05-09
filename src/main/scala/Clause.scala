@@ -5,13 +5,11 @@ import Term.Term
 object Clause {
 
   sealed trait Predicate { def name: String }
-
   sealed trait Clause { def toProlog: String }
   sealed trait Fact extends Clause { def name: String; def args: List[Term] }
   sealed trait Rule extends Clause { def head: Fact; def body: List[Fact] }
 
   private case class PredicateImpl(override val name: String) extends Predicate
-
   private case class FactImpl(override val name: String, override val args: List[Term]) extends Fact {
     override def toProlog: String = name + "(" + args.map(_.toProlog).mkString(",") + ")."
   }
@@ -43,12 +41,15 @@ object Clause {
   }
 
   implicit class RichFact(base: ValidationNel[IllegalArgumentException, Fact]) {
-    def :-(facts: ValidationNel[IllegalArgumentException, Fact]*): ValidationNel[IllegalArgumentException, Rule] = {
+    def :-(facts: ValidationNel[IllegalArgumentException, Fact]*): ValidationNel[IllegalArgumentException, Clause] = {
       val factsVal: ValidationNel[IllegalArgumentException, List[Fact]] =
         if(facts.nonEmpty) facts.foldLeft(List.empty[Fact].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc))
         else new IllegalArgumentException("Body (namely the list of facts) of the rule must be not empty").failureNel
       (base |@| factsVal)((head, body) => RuleImpl(head, body))
     }
   }
+
+  implicit def standardize(fact: ValidationNel[IllegalArgumentException, Fact]): ValidationNel[IllegalArgumentException, Clause] =
+    fact.asInstanceOf[ValidationNel[IllegalArgumentException, Clause]]
 
 }
