@@ -28,7 +28,7 @@ object Term {
         if(name.nonEmpty) name.successNel
         else new IllegalArgumentException("An empty string is not valid to represent a compound term").failureNel
       val nameVal2: ValidationNel[IllegalArgumentException, String] =
-        if(name.toCharArray.forall(c => c.isLetter)) name.successNel
+        if(name.toCharArray.forall(_.isLetter)) name.successNel
         else new IllegalArgumentException("String '" + name + "' is not valid to represent a compound term, because it doesn't contain only letters").failureNel
       val nameVal3: ValidationNel[IllegalArgumentException, String] =
         if(name.nonEmpty && name.charAt(0).isLower) name.successNel
@@ -45,7 +45,7 @@ object Term {
       if(name.nonEmpty) name.successNel
       else new IllegalArgumentException("An empty string is not valid to represent a term").failureNel
     val nameVal2: ValidationNel[IllegalArgumentException, String] =
-      if(name.toCharArray.forall(c => c.isLetter)) name.successNel
+      if(name.toCharArray.forall(_.isLetter)) name.successNel
       else new IllegalArgumentException("String '" + name + "' is not valid to represent a term, because it doesn't contain only letters").failureNel
     (nameVal1 |@| nameVal2)((name, _) => if(name.charAt(0).isLower) AtomImpl(name) else VariableImpl(name))
   }
