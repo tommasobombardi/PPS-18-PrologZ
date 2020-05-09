@@ -27,7 +27,7 @@ object Term {
   }
 
   object Struct {
-    def apply(name: String)(args: ValidationNel[IllegalArgumentException, Term]*): ValidationNel[IllegalArgumentException, Struct] = {
+    def apply(name: String)(args: ValidationNel[IllegalArgumentException, Term]*): ValidationNel[IllegalArgumentException, Term] = {
       val nameVal1: ValidationNel[IllegalArgumentException, String] =
         if(name.nonEmpty) name.successNel
         else new IllegalArgumentException("An empty string is not valid to represent a compound term").failureNel
