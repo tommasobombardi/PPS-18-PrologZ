@@ -26,13 +26,13 @@ object Term {
     //noinspection FindEmptyCheck
     def apply(name: String)(args: ValidationNel[IllegalArgumentException, Term]*): ValidationNel[IllegalArgumentException, Struct] = {
       val nameVal1: ValidationNel[IllegalArgumentException, String] =
-        if(name.isEmpty) new IllegalArgumentException("String representing compound term must be not empty").failureNel else name.successNel
+        if(name.isEmpty) new IllegalArgumentException("An empty string is not valid to represent a compound term").failureNel else name.successNel
       val nameVal2: ValidationNel[IllegalArgumentException, String] =
-        if(name.find(!_.isLetter).isDefined) new IllegalArgumentException("String representing compound term must contain only letter").failureNel else name.successNel
+        if(name.find(!_.isLetter).isDefined) new IllegalArgumentException("String '" + name + "' is not valid to represent a compound term, because it doesn't contain only letters").failureNel else name.successNel
       val nameVal3: ValidationNel[IllegalArgumentException, String] =
-        if(name.nonEmpty && name.charAt(0).isUpper) new IllegalArgumentException("String representing compound term must start with a lowercase letter").failureNel else name.successNel
+        if(name.nonEmpty && name.charAt(0).isUpper) new IllegalArgumentException("String '" + name + "' is not valid to represent a compound term, because it doesn't start with a lowercase letter").failureNel else name.successNel
       val argsVal: ValidationNel[IllegalArgumentException, List[Term]] =
-        if(args.isEmpty) new IllegalArgumentException("Argument list in compound term must be not empty").failureNel
+        if(args.isEmpty) new IllegalArgumentException("Argument list of compound term '" + name + "' must be not empty").failureNel
         else args.foldLeft(List.empty[Term].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc))
       (nameVal1 |@| nameVal2 |@| nameVal3 |@| argsVal)((name, _, _, args) => StructImpl(name, args))
     }
@@ -41,9 +41,9 @@ object Term {
   //noinspection FindEmptyCheck
   implicit def fromString(name: String): ValidationNel[IllegalArgumentException, Term] = {
     val nameVal1: ValidationNel[IllegalArgumentException, String] =
-      if(name.isEmpty) new IllegalArgumentException("String representing term must be not empty").failureNel else name.successNel
+      if(name.isEmpty) new IllegalArgumentException("An empty string is not valid to represent a term").failureNel else name.successNel
     val nameVal2: ValidationNel[IllegalArgumentException, String] =
-      if(name.find(!_.isLetter).isDefined) new IllegalArgumentException("String representing term must contain only letter").failureNel else name.successNel
+      if(name.find(!_.isLetter).isDefined) new IllegalArgumentException("String '" + name + "' is not valid to represent a term, because it doesn't contain only letters").failureNel else name.successNel
     (nameVal1 |@| nameVal2)((name, _) => if(name.charAt(0).isLower) AtomImpl(name) else VariableImpl(name))
   }
 
