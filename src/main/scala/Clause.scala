@@ -1,3 +1,5 @@
+import scalaz._
+import Scalaz._
 import Term.Term
 
 object Clause {
@@ -25,11 +27,17 @@ object Clause {
   }
 
   object Predicate {
-    def apply(name: String): Predicate = {
-      require(name.nonEmpty, "String representing predicate must be not empty")
-      require(name.forall(c => c.isLetter), "String representing predicate must contain only letters")
-      require(name.charAt(0).isLower, "String representing predicate must start with a lowercase letter")
-      PredicateImpl(name)
+    def apply(name: String): ValidationNel[IllegalArgumentException, Predicate] = {
+      val nameVal1: ValidationNel[IllegalArgumentException, String] =
+        if(name.nonEmpty) name.successNel
+        else new IllegalArgumentException("An empty string is not valid to represent a predicate").failureNel
+      val nameVal2: ValidationNel[IllegalArgumentException, String] =
+        if(name.forall(_.isLetter)) name.successNel
+        else new IllegalArgumentException("String '" + name + "' is not valid to represent a predicate, because it doesn't contain only letters").failureNel
+      val nameVal3: ValidationNel[IllegalArgumentException, String] =
+        if(name.nonEmpty && name.charAt(0).isLower) name.successNel
+        else new IllegalArgumentException("String '" + name + "' is not valid to represent a predicate, because it doesn't start with a lowercase letter").failureNel
+      (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => PredicateImpl(name))
     }
   }
 
