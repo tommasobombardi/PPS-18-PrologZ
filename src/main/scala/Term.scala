@@ -5,12 +5,16 @@ object Term {
 
   sealed trait Term { def toProlog: String }
   sealed trait Atom extends Term { def name: String }
+  sealed trait Double extends Term { def value: scala.Double }
   sealed trait Int extends Term { def value: scala.Int }
   sealed trait Struct extends Term { def name: String; def args: List[Term] }
   sealed trait Variable extends Term { def name: String }
 
   private case class AtomImpl(override val name: String) extends Atom {
     override def toProlog: String = name
+  }
+  private case class DoubleImpl(override val value: scala.Double) extends Double {
+    override def toProlog: String = value.toString
   }
   private case class IntImpl(override val value: scala.Int) extends Int {
     override def toProlog: String = value.toString
@@ -51,5 +55,7 @@ object Term {
   }
 
   implicit def fromInt(value: scala.Int): ValidationNel[IllegalArgumentException, Term] = IntImpl(value).asInstanceOf[Term].successNel
+
+  implicit def fromDouble(value: scala.Double): ValidationNel[IllegalArgumentException, Term] = DoubleImpl(value).asInstanceOf[Term].successNel
 
 }
