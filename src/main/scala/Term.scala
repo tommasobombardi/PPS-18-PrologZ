@@ -5,20 +5,12 @@ object Term {
 
   sealed trait Functor { def name: String }
   sealed trait Term { def toProlog: String }
-  sealed trait Atom extends Term { def name: String }
-  sealed trait Double extends Term { def value: scala.Double }
-  sealed trait Int extends Term { def value: scala.Int }
+  sealed trait Atom[A] extends Term { def value: A }
   sealed trait Struct extends Term { def name: String; def args: List[Term] }
   sealed trait Variable extends Term { def name: String }
 
   private case class FunctorImpl(override val name: String) extends Functor
-  private case class AtomImpl(override val name: String) extends Atom {
-    override def toProlog: String = name
-  }
-  private case class DoubleImpl(override val value: scala.Double) extends Double {
-    override def toProlog: String = value.toString
-  }
-  private case class IntImpl(override val value: scala.Int) extends Int {
+  private case class AtomImpl[A](override val value: A) extends Atom[A] {
     override def toProlog: String = value.toString
   }
   private case class StructImpl(override val name: String, override val args: List[Term]) extends Struct {
@@ -63,8 +55,8 @@ object Term {
     (nameVal1 |@| nameVal2)((name, _) => if(name.charAt(0).isLower) AtomImpl(name) else VariableImpl(name))
   }
 
-  implicit def fromInt(value: scala.Int): ValidationNel[IllegalArgumentException, Term] = IntImpl(value).asInstanceOf[Term].successNel
+  implicit def fromInt(value: scala.Int): ValidationNel[IllegalArgumentException, Term] = AtomImpl(value).asInstanceOf[Term].successNel
 
-  implicit def fromDouble(value: scala.Double): ValidationNel[IllegalArgumentException, Term] = DoubleImpl(value).asInstanceOf[Term].successNel
+  implicit def fromDouble(value: scala.Double): ValidationNel[IllegalArgumentException, Term] = AtomImpl(value).asInstanceOf[Term].successNel
 
 }
