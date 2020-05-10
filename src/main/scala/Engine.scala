@@ -11,11 +11,11 @@ object Engine {
 
   def solve(theory: List[ValidationNel[IllegalArgumentException, Clause]], goals: List[ValidationNel[IllegalArgumentException, Fact]]): Unit = validateProgram(theory, goals) match {
     case Failure(err: NonEmptyList[String]) => err.foreach(println(_))
-    case Success(p) => ((p._1) |+| (p._2)).foreach(c => println(c.toProlog)) // TO DO step by step
+    case Success(p) => (p._1 |+| p._2).foreach(c => println(c.toProlog)) // TO DO step by step
   }
   def solveAll(theory: List[ValidationNel[IllegalArgumentException, Clause]], goals: List[ValidationNel[IllegalArgumentException, Fact]]): Unit = validateProgram(theory, goals) match {
     case Failure(err: NonEmptyList[String]) => err.foreach(println(_))
-    case Success(p) => ((p._1) |+| (p._2)).foreach(c => println(c.toProlog)) // TO DO
+    case Success(p) => (p._1 |+| p._2).foreach(c => println(c.toProlog)) // TO DO
   }
 
   private def validateProgram(theory: List[ValidationNel[IllegalArgumentException, Clause]], goals: List[ValidationNel[IllegalArgumentException, Fact]]): ValidationNel[String, (List[Clause], List[Fact])] = {
