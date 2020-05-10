@@ -50,7 +50,7 @@ object Clause {
     }
   }
 
-  implicit def standardize(fact: ValidationNel[IllegalArgumentException, Fact]): ValidationNel[IllegalArgumentException, Clause] =
+  implicit def fromFact(fact: ValidationNel[IllegalArgumentException, Fact]): ValidationNel[IllegalArgumentException, Clause] =
     fact.asInstanceOf[ValidationNel[IllegalArgumentException, Clause]]
 
 }

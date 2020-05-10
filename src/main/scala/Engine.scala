@@ -11,17 +11,17 @@ object Engine {
 
   def solve(theory: List[ValidationNel[IllegalArgumentException, Clause]], goals: List[ValidationNel[IllegalArgumentException, Fact]]): Unit = ??? // TO DO step by step
   def solveAll(theory: List[ValidationNel[IllegalArgumentException, Clause]], goals: List[ValidationNel[IllegalArgumentException, Fact]]): Unit = {
-    val theoryVal: List[ValidationNel[String, Clause]] = theory.zipWithIndex.map({
+    val theoryReadableVal: List[ValidationNel[String, Clause]] = theory.zipWithIndex.map({
       case (Failure(nel: NonEmptyList[IllegalArgumentException]), index) => nel.map(err => "Error in Clause " + (index + 1) + ": " + err.getMessage).failure
       case (Success(a), _) => a.successNel
     })
-    val goalsVal: List[ValidationNel[String, Fact]] = goals.zipWithIndex.map({
+    val goalsReadableVal: List[ValidationNel[String, Fact]] = goals.zipWithIndex.map({
       case (Failure(nel: NonEmptyList[IllegalArgumentException]), index) => nel.map(err => "Error in Goal " + (index + 1) + ": " + err.getMessage).failure
       case (Success(a), _) => a.successNel
     })
     val programVal: ValidationNel[String, (List[Clause], List[Fact])] = {
-      (theoryVal.foldLeft(List.empty[Clause].successNel[String])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc))
-      |@| goalsVal.foldLeft(List.empty[Fact].successNel[String])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc)))((_, _))
+      (theoryReadableVal.foldLeft(List.empty[Clause].successNel[String])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc))
+      |@| goalsReadableVal.foldLeft(List.empty[Fact].successNel[String])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc)))((_, _))
     }
     programVal match {
       case Failure(e: NonEmptyList[String]) => e.foreach(println(_))
