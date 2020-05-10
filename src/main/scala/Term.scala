@@ -44,7 +44,6 @@ object Term {
     }
   }
 
-
   implicit def fromString(name: String): ValidationNel[IllegalArgumentException, Term] = {
     val nameVal1: ValidationNel[IllegalArgumentException, String] =
       if(name.nonEmpty) name.successNel
