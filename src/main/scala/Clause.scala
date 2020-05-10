@@ -45,7 +45,7 @@ object Clause {
     def setBody(facts: ValidationNel[IllegalArgumentException, Fact]*): ValidationNel[IllegalArgumentException, Clause] = {
       val factsVal: ValidationNel[IllegalArgumentException, List[Fact]] =
         if(facts.nonEmpty) facts.foldLeft(List.empty[Fact].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc))
-        else new IllegalArgumentException("Body (namely the list of facts) of the rule must be not empty").failureNel
+        else new IllegalArgumentException("Body (namely the list of facts) of a rule must be not empty").failureNel
       (base |@| factsVal)((head, body) => RuleImpl(head, body))
     }
   }
