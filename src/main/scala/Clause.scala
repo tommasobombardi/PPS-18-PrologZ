@@ -1,20 +1,23 @@
 import scalaz._
 import Scalaz._
 import Term.Term
+import Unification.Substitution
 
 object Clause {
 
   sealed trait Predicate { def name: String }
-  sealed trait Clause { def toProlog: String }
-  sealed trait Fact extends Clause { def name: String; def args: List[Term] }
-  sealed trait Rule extends Clause { def head: Fact; def body: List[Fact] }
+  sealed trait Clause { def toProlog: String; def substitute(subs: Substitution): Clause }
+  sealed trait Fact extends Clause { def name: String; def args: List[Term]; override def substitute(subs: Substitution): Fact }
+  sealed trait Rule extends Clause { def head: Fact; def body: List[Fact]; override def substitute(subs: Substitution): Rule }
 
   private case class PredicateImpl(override val name: String) extends Predicate
   private case class FactImpl(override val name: String, override val args: List[Term]) extends Fact {
     override def toProlog: String = name + "(" + args.map(_.toProlog).mkString(",") + ")."
+    override def substitute(subs: Substitution): Fact = this.copy(args = this.args.map(_.substitute(subs)))
   }
   private case class RuleImpl(override val head: Fact, override val body: List[Fact]) extends Rule {
     override def toProlog: String = head.toProlog.dropRight(1) + ":-" + body.map(_.toProlog.dropRight(1)).mkString(",") + "."
+    override def substitute(subs: Substitution): Rule = this.copy(this.head.substitute(subs), this.body.map(_.substitute(subs)))
   }
 
   object Predicate {
