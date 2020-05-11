@@ -21,7 +21,11 @@ object Term {
   }
   private case class VariableImpl(override val name: String) extends Variable {
     override def toProlog: String = name
-    override def substitute(subs: Substitution): Term = ???
+    override def substitute(subs: Substitution): Term = subs match {
+      case firstSub :: otherSubs if this == firstSub._1 => firstSub._2.substitute(otherSubs)
+      case _ :: otherSubs => this.substitute(otherSubs)
+      case _ => this
+    }
   }
 
   object Struct {
