@@ -1,6 +1,6 @@
 import scalaz._
 import Scalaz._
-import Clause.{Clause, Fact}
+import Clause._
 
 object Engine {
 
@@ -27,8 +27,8 @@ object Engine {
       case (Failure(nel: NonEmptyList[IllegalArgumentException]), index) => nel.map(err => new IllegalArgumentException("Error in Goal " + (index + 1) + ": " + err.getMessage)).failure
       case (Success(a), _) => a.successNel
     })
-    (theoryReadableVal.foldLeft(List.empty[Clause].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc))
-    |@| goalsReadableVal.foldLeft(List.empty[Fact].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc)))((_, _))
+    (theoryReadableVal.foldLeft(List.empty[Clause].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
+    |@| goalsReadableVal.foldLeft(List.empty[Fact].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el)))((_, _))
   }
 
 }

@@ -46,7 +46,7 @@ object Term {
   implicit class RichFunctor(base: ValidationNel[IllegalArgumentException, Functor]) {
     def apply(args: ValidationNel[IllegalArgumentException, Term]*): ValidationNel[IllegalArgumentException, Term] = {
       val argsVal: ValidationNel[IllegalArgumentException, List[Term]] =
-        if(args.nonEmpty) args.foldLeft(List.empty[Term].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc))
+        if(args.nonEmpty) args.foldLeft(List.empty[Term].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
         else new IllegalArgumentException("Body (namely the list of arguments) of a compound term must be not empty").failureNel
       (base |@| argsVal)((functor, args) => StructImpl(functor.name, args))
     }

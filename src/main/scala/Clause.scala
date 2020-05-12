@@ -38,7 +38,7 @@ object Clause {
   implicit class RichPredicate(base: ValidationNel[IllegalArgumentException, Predicate]) {
     def apply(args: ValidationNel[IllegalArgumentException, Term]*): ValidationNel[IllegalArgumentException, Fact] = {
       val argsVal: ValidationNel[IllegalArgumentException, List[Term]] =
-        args.foldLeft(List.empty[Term].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc))
+        args.foldLeft(List.empty[Term].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
       (base |@| argsVal)((predicate, args) => FactImpl(predicate.name, args))
     }
   }
@@ -47,7 +47,7 @@ object Clause {
     def :-(facts: ValidationNel[IllegalArgumentException, Fact]*): ValidationNel[IllegalArgumentException, Clause] = setBody(facts:_*)
     def setBody(facts: ValidationNel[IllegalArgumentException, Fact]*): ValidationNel[IllegalArgumentException, Clause] = {
       val factsVal: ValidationNel[IllegalArgumentException, List[Fact]] =
-        if(facts.nonEmpty) facts.foldLeft(List.empty[Fact].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => el :: acc))
+        if(facts.nonEmpty) facts.foldLeft(List.empty[Fact].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
         else new IllegalArgumentException("Body (namely the list of facts) of a rule must be not empty").failureNel
       (base |@| factsVal)((head, body) => RuleImpl(head, body))
     }
