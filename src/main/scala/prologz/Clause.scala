@@ -1,7 +1,9 @@
+package prologz
+
 import scalaz._
 import Scalaz._
-import Term.Term
-import Unification.Substitution
+import prologz.Term._
+import prologz.Unification._
 
 object Clause {
 
@@ -26,7 +28,7 @@ object Clause {
         if(name.nonEmpty) name.successNel
         else new IllegalArgumentException("An empty string is not valid to represent a predicate").failureNel
       val nameVal2: ValidationNel[IllegalArgumentException, String] =
-        if(name.forall(_.isLetter)) name.successNel
+        if(name.toCharArray.forall(_.isLetter)) name.successNel
         else new IllegalArgumentException("String '" + name + "' is not valid to represent a predicate, because it doesn't contain only letters").failureNel
       val nameVal3: ValidationNel[IllegalArgumentException, String] =
         if(name.nonEmpty && name.charAt(0).isLower) name.successNel

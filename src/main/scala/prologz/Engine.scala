@@ -1,6 +1,8 @@
+package prologz
+
 import scalaz._
 import Scalaz._
-import Clause._
+import prologz.Clause._
 
 object Engine {
 

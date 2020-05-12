@@ -1,6 +1,8 @@
+package prologz
+
 import scalaz._
 import Scalaz._
-import Term.{Term, Variable}
+import prologz.Term._
 
 object Unification {
 

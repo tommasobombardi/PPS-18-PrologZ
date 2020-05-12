@@ -1,6 +1,8 @@
+package prologz
+
 import scalaz._
 import Scalaz._
-import Unification.Substitution
+import prologz.Unification._
 
 object Term {
 
