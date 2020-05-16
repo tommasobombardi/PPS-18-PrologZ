@@ -2,16 +2,15 @@ package prologz
 
 import scalaz._
 import Scalaz._
+import prologz.Utility.InputError
 
 object Term {
 
-  sealed trait Functor { def name: String }
   sealed trait Term { def toProlog: String }
   sealed trait Atom[A] extends Term { def value: A }
   sealed trait Struct extends Term { def name: String; def args: List[Term] }
   sealed trait Variable extends Term { def name: String }
 
-  private[prologz] case class FunctorImpl(override val name: String) extends Functor
   private[prologz] case class AtomImpl[A](override val value: A) extends Atom[A] {
     override def toProlog: String = value.toString
   }
@@ -22,11 +21,10 @@ object Term {
     override def toProlog: String = name
   }
 
-  sealed trait InputError
-  def InputError(message: String): String @@ InputError = Tag[String, InputError](message)
+  sealed trait Functor
 
   object Struct {
-    def apply(name: String): ValidationNel[String @@ InputError, Functor] = {
+    def apply(name: String): ValidationNel[String @@ InputError, String @@ Functor] = {
       val nameVal1: ValidationNel[String @@ InputError, String] =
         if(name.nonEmpty) name.successNel
         else InputError("An empty string is not valid to represent a compound term").failureNel
@@ -36,16 +34,16 @@ object Term {
       val nameVal3: ValidationNel[String @@ InputError, String] =
         if(name.nonEmpty && name.charAt(0).isLower) name.successNel
         else InputError("String '" + name + "' is not valid to represent a compound term, because it doesn't start with a lowercase letter").failureNel
-      (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => FunctorImpl(name))
+      (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => Tag[String, Functor](name))
     }
   }
 
-  implicit class FunctorRich(base: ValidationNel[String @@ InputError, Functor]) {
+  implicit class FunctorRich(base: ValidationNel[String @@ InputError, String @@ Functor]) {
     def apply(args: ValidationNel[String @@ InputError, Term]*): ValidationNel[String @@ InputError, Term] = {
       val argsVal: ValidationNel[String @@ InputError, List[Term]] =
         if(args.nonEmpty) args.foldLeft(List.empty[Term].successNel[String @@ InputError])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
         else InputError("Body (namely the list of arguments) of a compound term must be not empty").failureNel
-      (base |@| argsVal)((functor, args) => StructImpl(functor.name, args))
+      (base |@| argsVal)((functor, args) => StructImpl(Tag.unwrap(functor), args))
     }
   }
 
