@@ -1,6 +1,6 @@
 package prologz
 
-import prologz.Term._
+import prologz.Term.{Term, Variable}
 
 private[prologz] object Substitution {
 
