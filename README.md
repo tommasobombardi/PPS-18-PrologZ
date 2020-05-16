@@ -2,4 +2,4 @@
 
 PrologZ is a DSL which imitates the core features of Prolog, to provide a direct support for logic programming in Scala.
 
-PrologZ is made using Scalaz, a Scala library for functional programming.
+This project is made using Scalaz, a library for functional programming that complements the Scala standard library.
