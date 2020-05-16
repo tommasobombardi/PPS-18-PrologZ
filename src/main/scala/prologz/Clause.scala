@@ -11,11 +11,11 @@ object Clause {
   sealed trait Fact extends Clause { def name: String; def args: List[Term] }
   sealed trait Rule extends Clause { def head: Fact; def body: List[Fact] }
 
-  private[prolog] case class PredicateImpl(override val name: String) extends Predicate
-  private[prolog] case class FactImpl(override val name: String, override val args: List[Term]) extends Fact {
+  private[prologz] case class PredicateImpl(override val name: String) extends Predicate
+  private[prologz] case class FactImpl(override val name: String, override val args: List[Term]) extends Fact {
     override def toProlog: String = name + "(" + args.map(_.toProlog).mkString(",") + ")."
   }
-  private[prolog] case class RuleImpl(override val head: Fact, override val body: List[Fact]) extends Rule {
+  private[prologz] case class RuleImpl(override val head: Fact, override val body: List[Fact]) extends Rule {
     override def toProlog: String = head.toProlog.dropRight(1) + ":-" + body.map(_.toProlog.dropRight(1)).mkString(",") + "."
   }
 
