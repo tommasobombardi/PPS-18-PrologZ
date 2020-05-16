@@ -12,6 +12,6 @@ private[prologz] object Substitution {
     def toProlog: String = "{" + base.map(s => s._1.toProlog + "/" + s._2.toProlog).mkString(",") + "}"
   }
 
-  implicit def fromTuple(arg: (Variable, Term)): Substitution = Substitution(arg)
+  implicit def fromTuple(arg: (Variable, Term)): Substitution = this(arg)
 
 }
