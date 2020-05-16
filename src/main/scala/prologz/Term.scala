@@ -22,6 +22,9 @@ object Term {
     override def toProlog: String = name
   }
 
+  sealed trait InputError
+  def InputError(message: String): String @@ InputError = Tag[String, InputError](message)
+
   object Struct {
     def apply(name: String): ValidationNel[IllegalArgumentException, Functor] = {
       val nameVal1: ValidationNel[IllegalArgumentException, String] =
