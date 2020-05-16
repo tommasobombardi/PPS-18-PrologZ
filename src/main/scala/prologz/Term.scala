@@ -2,32 +2,24 @@ package prologz
 
 import scalaz._
 import Scalaz._
-import prologz.Unification._
 
 object Term {
 
   sealed trait Functor { def name: String }
-  sealed trait Term { def toProlog: String; def substitute(subs: Substitution): Term }
+  sealed trait Term { def toProlog: String }
   sealed trait Atom[A] extends Term { def value: A }
   sealed trait Struct extends Term { def name: String; def args: List[Term] }
   sealed trait Variable extends Term { def name: String }
 
-  private case class FunctorImpl(override val name: String) extends Functor
-  private case class AtomImpl[A](override val value: A) extends Atom[A] {
+  private[prologz] case class FunctorImpl(override val name: String) extends Functor
+  private[prologz] case class AtomImpl[A](override val value: A) extends Atom[A] {
     override def toProlog: String = value.toString
-    override def substitute(subs: Substitution): Term = this
   }
-  private case class StructImpl(override val name: String, override val args: List[Term]) extends Struct {
+  private[prologz] case class StructImpl(override val name: String, override val args: List[Term]) extends Struct {
     override def toProlog: String = name + "(" + args.map(_.toProlog).mkString(",") + ")"
-    override def substitute(subs: Substitution): Term = this.copy(args = this.args.map(_.substitute(subs)))
   }
-  private case class VariableImpl(override val name: String) extends Variable {
+  private[prologz] case class VariableImpl(override val name: String) extends Variable {
     override def toProlog: String = name
-    override def substitute(subs: Substitution): Term = subs match {
-      case firstSub :: otherSubs if this == firstSub._1 => firstSub._2.substitute(otherSubs)
-      case _ :: otherSubs => this.substitute(otherSubs)
-      case _ => this
-    }
   }
 
   object Struct {
@@ -45,7 +37,7 @@ object Term {
     }
   }
 
-  implicit class RichFunctor(base: ValidationNel[IllegalArgumentException, Functor]) {
+  implicit class FunctorRich(base: ValidationNel[IllegalArgumentException, Functor]) {
     def apply(args: ValidationNel[IllegalArgumentException, Term]*): ValidationNel[IllegalArgumentException, Term] = {
       val argsVal: ValidationNel[IllegalArgumentException, List[Term]] =
         if(args.nonEmpty) args.foldLeft(List.empty[Term].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
