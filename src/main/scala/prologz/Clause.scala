@@ -20,39 +20,39 @@ object Clause {
   }
 
   object Predicate {
-    def apply(name: String): ValidationNel[IllegalArgumentException, Predicate] = {
-      val nameVal1: ValidationNel[IllegalArgumentException, String] =
+    def apply(name: String): ValidationNel[String @@ InputError, Predicate] = {
+      val nameVal1: ValidationNel[String @@ InputError, String] =
         if(name.nonEmpty) name.successNel
-        else new IllegalArgumentException("An empty string is not valid to represent a predicate").failureNel
-      val nameVal2: ValidationNel[IllegalArgumentException, String] =
+        else InputError("An empty string is not valid to represent a predicate").failureNel
+      val nameVal2: ValidationNel[String @@ InputError, String] =
         if(name.toCharArray.forall(_.isLetter)) name.successNel
-        else new IllegalArgumentException("String '" + name + "' is not valid to represent a predicate, because it doesn't contain only letters").failureNel
-      val nameVal3: ValidationNel[IllegalArgumentException, String] =
+        else InputError("String '" + name + "' is not valid to represent a predicate, because it doesn't contain only letters").failureNel
+      val nameVal3: ValidationNel[String @@ InputError, String] =
         if(name.nonEmpty && name.charAt(0).isLower) name.successNel
-        else new IllegalArgumentException("String '" + name + "' is not valid to represent a predicate, because it doesn't start with a lowercase letter").failureNel
+        else InputError("String '" + name + "' is not valid to represent a predicate, because it doesn't start with a lowercase letter").failureNel
       (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => PredicateImpl(name))
     }
   }
 
-  implicit class PredicateRich(base: ValidationNel[IllegalArgumentException, Predicate]) {
-    def apply(args: ValidationNel[IllegalArgumentException, Term]*): ValidationNel[IllegalArgumentException, Fact] = {
-      val argsVal: ValidationNel[IllegalArgumentException, List[Term]] =
-        args.foldLeft(List.empty[Term].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
+  implicit class PredicateRich(base: ValidationNel[String @@ InputError, Predicate]) {
+    def apply(args: ValidationNel[String @@ InputError, Term]*): ValidationNel[String @@ InputError, Fact] = {
+      val argsVal: ValidationNel[String @@ InputError, List[Term]] =
+        args.foldLeft(List.empty[Term].successNel[String @@ InputError])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
       (base |@| argsVal)((predicate, args) => FactImpl(predicate.name, args))
     }
-  }
+  }+
 
-  implicit class FactRich(base: ValidationNel[IllegalArgumentException, Fact]) {
-    def :-(facts: ValidationNel[IllegalArgumentException, Fact]*): ValidationNel[IllegalArgumentException, Clause] = setBody(facts:_*)
-    def setBody(facts: ValidationNel[IllegalArgumentException, Fact]*): ValidationNel[IllegalArgumentException, Clause] = {
-      val factsVal: ValidationNel[IllegalArgumentException, List[Fact]] =
-        if(facts.nonEmpty) facts.foldLeft(List.empty[Fact].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
-        else new IllegalArgumentException("Body (namely the list of facts) of a rule must be not empty").failureNel
+  implicit class FactRich(base: ValidationNel[String @@ InputError, Fact]) {
+    def :-(facts: ValidationNel[String @@ InputError, Fact]*): ValidationNel[String @@ InputError, Clause] = setBody(facts:_*)
+    def setBody(facts: ValidationNel[String @@ InputError, Fact]*): ValidationNel[String @@ InputError, Clause] = {
+      val factsVal: ValidationNel[String @@ InputError, List[Fact]] =
+        if(facts.nonEmpty) facts.foldLeft(List.empty[Fact].successNel[String @@ InputError])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
+        else InputError("Body (namely the list of facts) of a rule must be not empty").failureNel
       (base |@| factsVal)((head, body) => RuleImpl(head, body))
     }
   }
 
-  implicit def fromFact(fact: ValidationNel[IllegalArgumentException, Fact]): ValidationNel[IllegalArgumentException, Clause] =
-    fact.asInstanceOf[ValidationNel[IllegalArgumentException, Clause]]
+  implicit def fromFact(fact: ValidationNel[String @@ InputError, Fact]): ValidationNel[String @@ InputError, Clause] =
+    fact.asInstanceOf[ValidationNel[String @@ InputError, Clause]]
 
 }

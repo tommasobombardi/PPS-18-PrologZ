@@ -26,41 +26,41 @@ object Term {
   def InputError(message: String): String @@ InputError = Tag[String, InputError](message)
 
   object Struct {
-    def apply(name: String): ValidationNel[IllegalArgumentException, Functor] = {
-      val nameVal1: ValidationNel[IllegalArgumentException, String] =
+    def apply(name: String): ValidationNel[String @@ InputError, Functor] = {
+      val nameVal1: ValidationNel[String @@ InputError, String] =
         if(name.nonEmpty) name.successNel
         else new IllegalArgumentException("An empty string is not valid to represent a compound term").failureNel
-      val nameVal2: ValidationNel[IllegalArgumentException, String] =
+      val nameVal2: ValidationNel[String @@ InputError, String] =
         if(name.toCharArray.forall(_.isLetter)) name.successNel
         else new IllegalArgumentException("String '" + name + "' is not valid to represent a compound term, because it doesn't contain only letters").failureNel
-      val nameVal3: ValidationNel[IllegalArgumentException, String] =
+      val nameVal3: ValidationNel[String @@ InputError, String] =
         if(name.nonEmpty && name.charAt(0).isLower) name.successNel
         else new IllegalArgumentException("String '" + name + "' is not valid to represent a compound term, because it doesn't start with a lowercase letter").failureNel
       (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => FunctorImpl(name))
     }
   }
 
-  implicit class FunctorRich(base: ValidationNel[IllegalArgumentException, Functor]) {
-    def apply(args: ValidationNel[IllegalArgumentException, Term]*): ValidationNel[IllegalArgumentException, Term] = {
-      val argsVal: ValidationNel[IllegalArgumentException, List[Term]] =
+  implicit class FunctorRich(base: ValidationNel[String @@ InputError, Functor]) {
+    def apply(args: ValidationNel[String @@ InputError, Term]*): ValidationNel[String @@ InputError, Term] = {
+      val argsVal: ValidationNel[String @@ InputError, List[Term]] =
         if(args.nonEmpty) args.foldLeft(List.empty[Term].successNel[IllegalArgumentException])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
         else new IllegalArgumentException("Body (namely the list of arguments) of a compound term must be not empty").failureNel
       (base |@| argsVal)((functor, args) => StructImpl(functor.name, args))
     }
   }
 
-  implicit def fromString(name: String): ValidationNel[IllegalArgumentException, Term] = {
-    val nameVal1: ValidationNel[IllegalArgumentException, String] =
+  implicit def fromString(name: String): ValidationNel[String @@ InputError, Term] = {
+    val nameVal1: ValidationNel[String @@ InputError, String] =
       if(name.nonEmpty) name.successNel
       else new IllegalArgumentException("An empty string is not valid to represent a term").failureNel
-    val nameVal2: ValidationNel[IllegalArgumentException, String] =
+    val nameVal2: ValidationNel[String @@ InputError, String] =
       if(name.toCharArray.forall(_.isLetter)) name.successNel
       else new IllegalArgumentException("String '" + name + "' is not valid to represent a term, because it doesn't contain only letters").failureNel
     (nameVal1 |@| nameVal2)((name, _) => if(name.charAt(0).isLower) AtomImpl(name) else VariableImpl(name))
   }
 
-  implicit def fromInt(value: scala.Int): ValidationNel[IllegalArgumentException, Term] = AtomImpl(value).asInstanceOf[Term].successNel
+  implicit def fromInt(value: scala.Int): ValidationNel[String @@ InputError, Term] = AtomImpl(value).asInstanceOf[Term].successNel
 
-  implicit def fromDouble(value: scala.Double): ValidationNel[IllegalArgumentException, Term] = AtomImpl(value).asInstanceOf[Term].successNel
+  implicit def fromDouble(value: scala.Double): ValidationNel[String @@ InputError, Term] = AtomImpl(value).asInstanceOf[Term].successNel
 
 }
