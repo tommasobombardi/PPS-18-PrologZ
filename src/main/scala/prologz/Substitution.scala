@@ -1,6 +1,7 @@
 package prologz
 
 import prologz.Term.{Term, Variable}
+import prologz.Unification._
 
 private[prologz] object Substitution {
 
@@ -10,6 +11,7 @@ private[prologz] object Substitution {
 
   implicit class RichSubstitution(base: Substitution) {
     def toProlog: String = "{" + base.map(s => s._1.toProlog + "/" + s._2.toProlog).mkString(",") + "}"
+    def getResult(variables: Set[Variable]): Substitution = variables.toList.zip(variables.toList.substitute(base))
   }
 
   implicit def fromTuple(arg: (Variable, Term)): Substitution = this(arg)
