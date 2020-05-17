@@ -11,7 +11,7 @@ private[prologz] object Substitution {
 
   implicit class RichSubstitution(base: Substitution) {
     def toProlog: String = "{" + base.map(s => s._1.toProlog + "/" + s._2.toProlog).mkString(",") + "}"
-    def getResult(variables: Set[Variable]): Substitution = variables.toList.zip(variables.toList.substitute(base))
+    def getResult(variables: Set[Variable]): Substitution = variables.toList.zip(variables.toList.substitute(base)).filter(sub => sub._1 != sub._2)
   }
 
   implicit def fromTuple(arg: (Variable, Term)): Substitution = this(arg)
