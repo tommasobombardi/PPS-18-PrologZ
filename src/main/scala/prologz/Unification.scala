@@ -67,7 +67,7 @@ private[prologz] object Unification {
     case ((t: Term) :: ft, (v: Variable) :: gt) => unifyTerms(ft.substitute(v, t), gt.substitute(v, t), subs |+| (v, t))
     case (_ :: _, _) => None // theory and goal terms don't unify because they have different length
     case (_, _ :: _) => None // theory and goal terms don't unify because they have different length
-    case _ => Option(subs) // successfully unified
+    case _ => subs.some // successfully unified
   }
 
   @scala.annotation.tailrec
