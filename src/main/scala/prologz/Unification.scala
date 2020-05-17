@@ -2,58 +2,36 @@ package prologz
 
 import scalaz._
 import Scalaz._
-import prologz.Clause.{Clause, Fact, FactImpl, Rule, RuleImpl}
+import prologz.Clause.{Clause, Fact, Rule}
 import prologz.Substitution._
-import prologz.Term.{Struct, StructImpl, Term, Variable, VariableImpl}
+import prologz.Term.{Struct, Term, Variable}
 
 private[prologz] object Unification {
 
-  implicit class RichTermList(base: List[Term]) {
-    def getVariables: Set[Variable] = getVariablesTerms(base)
-    def rename(variables: Set[Variable]): List[Term] = renameTerms(base, variables, variables |+| base.getVariables)
-    def substitute(subs: Substitution): List[Term] = subs.map(substituteTerms).foldLeft(identity[List[Term]](_))((acc, el) => acc >>> el)(base)
-  }
-
-  implicit class RichFact(base: Fact) {
-    def getVariables: Set[Variable] = base.args.getVariables
-    def rename(variables: Set[Variable]): Fact = FactImpl(base.name, base.args.rename(variables))
-    def substitute(subs: Substitution): Fact = FactImpl(base.name, base.args.substitute(subs))
-    def unify(goal: Fact, otherGoals: List[Fact]) : Option[(Substitution, List[Fact])] = {
-      if(base.name != goal.name || base.args.size != goal.args.size) None else
-        ((fact: Fact) => for {
-          renamedFact <- StateT[Option, List[Fact], Fact](goals => (goals, fact.rename(goals.getVariables)).some)
-          subs <- StateT[Option, List[Fact], Substitution](goals => unifyTerms(renamedFact.args, goals.head.args).map((goals.tail, _)))
-          _ <- StateT[Option, List[Fact], Unit](goals => (goals.substitute(subs), {}).some)
-        } yield subs)(base)(goal :: otherGoals).map(_.swap)
+  implicit class RichClause(base: Clause) {
+    def unify(goal: Fact, otherGoals: List[Fact]) : Option[(Substitution, List[Fact])] = base match {
+      case fact: Fact => unifyFact(fact, goal, otherGoals)
+      case rule: Rule => unifyRule(rule, goal, otherGoals)
     }
   }
 
-  implicit class RichFactList(base: List[Fact]) {
-    def getVariables: Set[Variable] = base.foldLeft(Set[Variable]())((acc, el) => acc |+| el.getVariables)
-    def rename(variables: Set[Variable]): List[Fact] = base.map(_.rename(variables))
-    def substitute(subs: Substitution): List[Fact] = base.map(_.substitute(subs))
+  private def unifyFact(fact: Fact, goal: Fact, otherGoals: List[Fact]) : Option[(Substitution, List[Fact])] = {
+    if(fact.name != goal.name || fact.args.size != goal.args.size) None else
+      ((fact: Fact) => for {
+        renamedFact <- StateT[Option, List[Fact], Fact](goals => (goals, fact.rename(goals.getVariables)).some)
+        subs <- StateT[Option, List[Fact], Substitution](goals => unifyTerms(renamedFact.args, goals.head.args).map((goals.tail, _)))
+        _ <- StateT[Option, List[Fact], Unit](goals => (goals.substitute(subs), {}).some)
+      } yield subs)(fact)(goal :: otherGoals).map(_.swap)
   }
 
-  implicit class RichRule(base: Rule) {
-    def getVariables: Set[Variable] = base.head.getVariables |+| base.body.getVariables
-    def rename(variables: Set[Variable]): Rule = RuleImpl(base.head.rename(variables), base.body.map(_.rename(variables)))
-    def substitute(subs: Substitution): Rule = RuleImpl(base.head.substitute(subs), base.body.map(_.substitute(subs)))
-    def unify(goal: Fact, otherGoals: List[Fact]) : Option[(Substitution, List[Fact])] = {
-      if(base.head.name != goal.name || base.head.args.size != goal.args.size) None else
-        ((rule: Rule) => for {
-          renamedRule <- StateT[Option, List[Fact], Rule](goals => (goals, rule.rename(goals.getVariables)).some)
-          subs <- StateT[Option, List[Fact], Substitution](goals => unifyTerms(renamedRule.head.args, goals.head.args).map((goals.tail, _)))
-          _ <- StateT[Option, List[Fact], Unit](goals => (renamedRule.body.rename(goals.getVariables.diff(renamedRule.head.getVariables)) |+| goals, {}).some)
-          _ <- StateT[Option, List[Fact], Unit](goals => (goals.substitute(subs), {}).some)
-        } yield subs)(base)(goal :: otherGoals).map(_.swap)
-    }
-  }
-
-  implicit class RichClause(clause: Clause) {
-    def unify(goal: Fact, otherGoals: List[Fact]) : Option[(Substitution, List[Fact])] = clause match {
-      case fact: Fact => fact.unify(goal, otherGoals)
-      case rule: Rule => rule.unify(goal, otherGoals)
-    }
+  private def unifyRule(rule: Rule, goal: Fact, otherGoals: List[Fact]) : Option[(Substitution, List[Fact])] = {
+    if(rule.head.name != goal.name || rule.head.args.size != goal.args.size) None else
+      ((rule: Rule) => for {
+        renamedRule <- StateT[Option, List[Fact], Rule](goals => (goals, rule.rename(goals.getVariables)).some)
+        subs <- StateT[Option, List[Fact], Substitution](goals => unifyTerms(renamedRule.head.args, goals.head.args).map((goals.tail, _)))
+        _ <- StateT[Option, List[Fact], Unit](goals => (renamedRule.body.rename(goals.getVariables.diff(renamedRule.head.getVariables)) |+| goals, {}).some)
+        _ <- StateT[Option, List[Fact], Unit](goals => (goals.substitute(subs), {}).some)
+      } yield subs)(rule)(goal :: otherGoals).map(_.swap)
   }
 
   @scala.annotation.tailrec
@@ -68,29 +46,6 @@ private[prologz] object Unification {
     case (_ :: _, _) => None // theory and goal terms don't unify because they have different length
     case (_, _ :: _) => None // theory and goal terms don't unify because they have different length
     case _ => subs.some // successfully unified
-  }
-
-  @scala.annotation.tailrec
-  private def getVariablesTerms(terms: List[Term], variables: Set[Variable] = Set()): Set[Variable] = terms match {
-    case (v: Variable) :: other => getVariablesTerms(other, variables + v)
-    case (s: Struct) :: other => getVariablesTerms(s.args |+| other, variables)
-    case _ :: other => getVariablesTerms(other, variables)
-    case _ => variables
-  }
-
-  private def renameTerms(terms: List[Term], variables: Set[Variable], notValidVars: Set[Variable], attempt: Int = 1): List[Term] = terms match {
-    case (v: Variable) :: _ if variables.contains(v) && notValidVars.contains(VariableImpl(v.name + ("a" * attempt))) => renameTerms(terms, variables, notValidVars, attempt + 1)
-    case (v: Variable) :: other if variables.contains(v) => VariableImpl(v.name + ("a" * attempt)) :: renameTerms(other, variables, notValidVars)
-    case (s: Struct) :: other => StructImpl(s.name, renameTerms(s.args, variables, variables |+| s.args.getVariables)) :: renameTerms(other, variables, notValidVars)
-    case term :: other => term :: renameTerms(other, variables, notValidVars)
-    case _ => Nil
-  }
-
-  private def substituteTerms(sub: (Variable, Term))(terms: List[Term]): List[Term] = terms match {
-    case (v: Variable) :: other if v == sub._1 => sub._2 :: substituteTerms(sub)(other)
-    case (s: Struct) :: other => StructImpl(s.name, substituteTerms(sub)(s.args)) :: substituteTerms(sub)(other)
-    case term :: other => term :: substituteTerms(sub)(other)
-    case _ => Nil
   }
 
 }
