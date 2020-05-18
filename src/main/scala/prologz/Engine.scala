@@ -7,7 +7,7 @@ import prologz.Clause.{Clause, Fact}
 import prologz.Substitution._
 import prologz.Term.Variable
 import prologz.Unification._
-import prologz.Utility.{InputError,validateProgram}
+import prologz.Validation.{InputError,validateProgram}
 
 object Engine {
 
@@ -20,9 +20,9 @@ object Engine {
 
   def setPrintTree(status: Boolean): Unit = printTree = status
 
-  def solve(goals: ValidationNel[String @@ InputError, Fact]*): Unit = solveProlog(theory, goals.toList, stepByStep = true)
+  def solve(goals: ValidationNel[String @@ InputError, Fact]*): Unit = solveProgram(theory, goals.toList, stepByStep = true)
 
-  def solveAll(goals: ValidationNel[String @@ InputError, Fact]*): Unit = solveProlog(theory, goals.toList, stepByStep = false)
+  def solveAll(goals: ValidationNel[String @@ InputError, Fact]*): Unit = solveProgram(theory, goals.toList, stepByStep = false)
 
   @scala.annotation.tailrec
   private def constructPrologTree(theory: List[Clause], tree: TreeLoc[(List[Clause], List[Fact], Substitution)]): TreeLoc[(List[Clause], List[Fact], Substitution)] = tree.getLabel match {
@@ -38,7 +38,7 @@ object Engine {
     el._2.map(_.toProlog.dropRight(1)).mkString(",") + " || " + el._3.getResult(goalsVariables).toProlog
   })
 
-  private def solveProlog(theory: List[ValidationNel[String @@ InputError, Clause]], goals: List[ValidationNel[String @@ InputError, Fact]], stepByStep: Boolean): Unit = validateProgram(theory, goals) match {
+  private def solveProgram(theory: List[ValidationNel[String @@ InputError, Clause]], goals: List[ValidationNel[String @@ InputError, Fact]], stepByStep: Boolean): Unit = validateProgram(theory, goals) match {
     case Failure(err: NonEmptyList[String @@ InputError]) =>
       solved += 1
       println("[PROLOGZ ENGINE] Error report of program " + solved)

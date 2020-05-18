@@ -2,7 +2,7 @@ package prologz
 
 import scalaz._
 import Scalaz._
-import prologz.Utility.InputError
+import prologz.Validation.InputError
 
 object Term {
 
