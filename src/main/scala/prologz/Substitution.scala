@@ -51,8 +51,8 @@ private[prologz] object Substitution {
   }
 
   private def renameTerms(terms: List[Term], variables: Set[Variable], notValidVars: Set[Variable], attempt: Int = 1): List[Term] = terms match {
-    case (v: Variable) :: _ if variables.contains(v) && notValidVars.contains(VariableImpl(v.name + ("a" * attempt))) => renameTerms(terms, variables, notValidVars, attempt + 1)
-    case (v: Variable) :: other if variables.contains(v) => VariableImpl(v.name + ("a" * attempt)) :: renameTerms(other, variables, notValidVars)
+    case (v: Variable) :: _ if variables.contains(v) && notValidVars.contains(VariableImpl(v.name + ("'" * attempt))) => renameTerms(terms, variables, notValidVars, attempt + 1)
+    case (v: Variable) :: other if variables.contains(v) => VariableImpl(v.name + ("'" * attempt)) :: renameTerms(other, variables, notValidVars)
     case (s: Struct) :: other => StructImpl(s.name, renameTerms(s.args, variables, variables |+| s.args.getVariables)) :: renameTerms(other, variables, notValidVars)
     case term :: other => term :: renameTerms(other, variables, notValidVars)
     case _ => Nil
