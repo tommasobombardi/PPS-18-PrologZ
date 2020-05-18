@@ -9,12 +9,14 @@ private[prologz] object Validation {
   sealed trait InputError
   def InputError(message: String): String @@ InputError = Tag[String, InputError](message)
 
-  def validateProgram(theory: List[ValidationNel[String @@ InputError, Clause]], goals: List[ValidationNel[String @@ InputError, Fact]]): ValidationNel[String @@ InputError, (List[Clause], List[Fact])] = {
-    val theoryReadableVal: List[ValidationNel[String @@ InputError, Clause]] = theory.zipWithIndex.map({
+  type PzValidation[A] = ValidationNel[String @@ InputError, A]
+
+  def validateProgram(theory: List[PzValidation[Clause]], goals: List[PzValidation[Fact]]): PzValidation[(List[Clause], List[Fact])] = {
+    val theoryReadableVal: List[PzValidation[Clause]] = theory.zipWithIndex.map({
       case (Failure(nel: NonEmptyList[String @@ InputError]), index) => nel.map(err => InputError("Error in Clause " + (index + 1) + ": " + Tag.unwrap(err))).failure
       case (Success(a), _) => a.successNel
     })
-    val goalsReadableVal: List[ValidationNel[String @@ InputError, Fact]] = goals.zipWithIndex.map({
+    val goalsReadableVal: List[PzValidation[Fact]] = goals.zipWithIndex.map({
       case (Failure(nel: NonEmptyList[String @@ InputError]), index) => nel.map(err => InputError("Error in Goal " + (index + 1) + ": " + Tag.unwrap(err))).failure
       case (Success(a), _) => a.successNel
     })

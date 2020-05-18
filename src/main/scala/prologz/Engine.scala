@@ -7,22 +7,22 @@ import prologz.Clause.{Clause, Fact}
 import prologz.Substitution._
 import prologz.Term.Variable
 import prologz.Unification._
-import prologz.Validation.{InputError,validateProgram}
+import prologz.Validation.{InputError, PzValidation, validateProgram}
 
 object Engine {
 
   private var solved: Int = 0
   private var printTree: Boolean = false
-  private var theory: List[ValidationNel[String @@ InputError, Clause]] = Nil
+  private var theory: List[PzValidation[Clause]] = Nil
 
-  def addTheory(clauses: ValidationNel[String @@ InputError, Clause]*): Unit = theory = theory |+| clauses.toList
+  def addTheory(clauses: PzValidation[Clause]*): Unit = theory = theory |+| clauses.toList
   def resetTheory(): Unit = theory = Nil
 
   def setPrintTree(status: Boolean): Unit = printTree = status
 
-  def solve(goals: ValidationNel[String @@ InputError, Fact]*): Unit = solveProgram(theory, goals.toList, stepByStep = true)
+  def solve(goals: PzValidation[Fact]*): Unit = solveProgram(theory, goals.toList, stepByStep = true)
 
-  def solveAll(goals: ValidationNel[String @@ InputError, Fact]*): Unit = solveProgram(theory, goals.toList, stepByStep = false)
+  def solveAll(goals: PzValidation[Fact]*): Unit = solveProgram(theory, goals.toList, stepByStep = false)
 
   @scala.annotation.tailrec
   private def constructPrologTree(theory: List[Clause], tree: TreeLoc[(List[Clause], List[Fact], Substitution)]): TreeLoc[(List[Clause], List[Fact], Substitution)] = tree.getLabel match {
@@ -38,7 +38,7 @@ object Engine {
     el._2.map(_.toProlog.dropRight(1)).mkString(",") + " || " + el._3.getResult(goalsVariables).toProlog
   })
 
-  private def solveProgram(theory: List[ValidationNel[String @@ InputError, Clause]], goals: List[ValidationNel[String @@ InputError, Fact]], stepByStep: Boolean): Unit = validateProgram(theory, goals) match {
+  private def solveProgram(theory: List[PzValidation[Clause]], goals: List[PzValidation[Fact]], stepByStep: Boolean): Unit = validateProgram(theory, goals) match {
     case Failure(err: NonEmptyList[String @@ InputError]) =>
       solved += 1
       println("[PROLOGZ ENGINE] Error report of program " + solved)
@@ -55,7 +55,8 @@ object Engine {
             println("[PROLOGZ ENGINE] Available solution: " + subs.toProlog)
             println("[PROLOGZ ENGINE] Available solution: " + p._2.map(_.substitute(subs)).map(_.toProlog.dropRight(1)).mkString(","))
           }
-          !node.isRoot && (!stepByStep || { println("[PROLOGZ ENGINE] Other alternatives can be explored. Next/Accept? (N/A)"); val in = readLine.toLowerCase; in == "n" || in == "next" })
+          !node.isRoot && (!stepByStep || { println("[PROLOGZ ENGINE] Other alternatives can be explored. Next/Accept? (N/A)")
+            val in = readLine.toLowerCase; in == "n" || in == "next" })
         })
       if(printTree) { println("[PROLOGZ ENGINE] Prolog tree created during resolution"); println(tree.toTree.drawTree(p._2.getVariables)) }
       println()
