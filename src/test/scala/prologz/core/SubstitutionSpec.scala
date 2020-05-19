@@ -1,4 +1,4 @@
-package prologz
+package prologz.core
 
 import org.scalatest.FlatSpec
 

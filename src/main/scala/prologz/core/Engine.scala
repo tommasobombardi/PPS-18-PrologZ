@@ -1,12 +1,12 @@
-package prologz
+package prologz.core
 
 import scalaz._
 import Scalaz._
 import scala.io.StdIn.readLine
-import prologz.Clause.{Clause, Fact}
-import prologz.Substitution._
-import prologz.Unification._
-import prologz.Validation.{InputError, PzValidation, validateProgram}
+import prologz.core.Clause.{Clause, Fact}
+import prologz.core.Substitution._
+import prologz.core.Unification._
+import prologz.core.Validation.{InputError, PzValidation, validateProgram}
 
 object Engine {
 

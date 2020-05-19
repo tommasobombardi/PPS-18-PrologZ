@@ -1,9 +1,9 @@
-package prologz
+package prologz.core
 
 import scalaz._
 import Scalaz._
 import scala.language.implicitConversions
-import prologz.Validation.{InputError, PzValidation}
+import prologz.core.Validation.{InputError, PzValidation}
 
 object Term {
 
@@ -12,13 +12,13 @@ object Term {
   sealed trait Struct extends Term { def name: String; def args: List[Term] }
   sealed trait Variable extends Term { def name: String }
 
-  private[prologz] case class AtomImpl[A](override val value: A) extends Atom[A] {
+  private[core] case class AtomImpl[A](override val value: A) extends Atom[A] {
     override def toProlog: String = value.toString
   }
-  private[prologz] case class StructImpl(override val name: String, override val args: List[Term]) extends Struct {
+  private[core] case class StructImpl(override val name: String, override val args: List[Term]) extends Struct {
     override def toProlog: String = name + "(" + args.map(_.toProlog).mkString(",") + ")"
   }
-  private[prologz] case class VariableImpl(override val name: String) extends Variable {
+  private[core] case class VariableImpl(override val name: String) extends Variable {
     override def toProlog: String = name
   }
 

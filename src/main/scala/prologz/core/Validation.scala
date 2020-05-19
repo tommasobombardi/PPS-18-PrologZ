@@ -1,10 +1,10 @@
-package prologz
+package prologz.core
 
 import scalaz._
 import Scalaz._
-import prologz.Clause.{Clause, Fact}
+import prologz.core.Clause.{Clause, Fact}
 
-private[prologz] object Validation {
+private[core] object Validation {
 
   sealed trait InputError
   def InputError(message: String): String @@ InputError = Tag[String, InputError](message)

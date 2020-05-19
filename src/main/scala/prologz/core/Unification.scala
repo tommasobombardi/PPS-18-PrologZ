@@ -1,12 +1,12 @@
-package prologz
+package prologz.core
 
 import scalaz._
 import Scalaz._
-import prologz.Clause.{Clause, Fact, Rule}
-import prologz.Substitution._
-import prologz.Term.{Struct, Term, Variable}
+import prologz.core.Clause.{Clause, Fact, Rule}
+import prologz.core.Substitution._
+import prologz.core.Term.{Struct, Term, Variable}
 
-private[prologz] object Unification {
+private[core] object Unification {
 
   implicit class RichClause(base: Clause) {
     def unify(goal: Fact, otherGoals: List[Fact]) : Option[(Substitution, List[Fact])] = base match {

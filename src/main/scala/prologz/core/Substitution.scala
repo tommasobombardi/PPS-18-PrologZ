@@ -1,12 +1,12 @@
-package prologz
+package prologz.core
 
 import scalaz._
 import Scalaz._
 import scala.language.implicitConversions
-import prologz.Clause.{Fact, FactImpl, Rule, RuleImpl}
-import prologz.Term.{Struct, StructImpl, Term, Variable, VariableImpl}
+import prologz.core.Clause.{Fact, FactImpl, Rule, RuleImpl}
+import prologz.core.Term.{Struct, StructImpl, Term, Variable, VariableImpl}
 
-private[prologz] object Substitution {
+private[core] object Substitution {
 
   type Substitution = Map[Variable, Term]
 
