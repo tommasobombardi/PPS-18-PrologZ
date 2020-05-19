@@ -2,6 +2,6 @@ package prologz
 
 import org.scalatest.FlatSpec
 
-class UnificationTest extends FlatSpec {
+class SubstitutionSpec extends FlatSpec {
 
 }
