@@ -43,23 +43,23 @@ object Engine {
   private def solveProgram(theory: List[PzValidation[Clause]], goals: List[PzValidation[Fact]], stepByStep: Boolean): Unit = validateProgram(theory, goals) match {
     case Failure(err: NonEmptyList[String @@ InputError]) =>
       solved += 1
-      println("[PROLOGZ ENGINE] Error report of program " + solved)
-      err.foreach(e => println("[PROLOGZ ENGINE] " + Tag.unwrap(e)))
+      println("[PROLOG ENGINE] Error report of program " + solved)
+      err.foreach(e => println("[PROLOG ENGINE] " + Tag.unwrap(e)))
       println()
     case Success(p) =>
       solved += 1
-      println("[PROLOGZ ENGINE] Resolution of program " + solved)
+      println("[PROLOG ENGINE] Resolution of program " + solved)
       val tree: TreeLoc[(List[Clause], List[Fact], Substitution)] = navigatePrologTree(p._1, createPrologTree(p._1, p._2))
         .whileDo(node => navigatePrologTree(p._1, node.parent.get), /* backtracking (in case of leaf node with valid solution) */ node => {
-          if (node.getLabel._2.nonEmpty) println("[PROLOGZ ENGINE] Execution completed, all alternatives have been explored")
+          if (node.getLabel._2.nonEmpty) println("[PROLOG ENGINE] Execution completed, all alternatives have been explored")
           else {
-            println("[PROLOGZ ENGINE] Available solution: " + node.getLabel._3.getResult.toProlog)
-            println("[PROLOGZ ENGINE] Available solution: " + p._2.map(_.substitute(node.getLabel._3.getResult)).map(_.toProlog.dropRight(1)).mkString(","))
+            println("[PROLOG ENGINE] Available solution: " + node.getLabel._3.getResult.toProlog)
+            println("[PROLOG ENGINE] Available solution: " + p._2.map(_.substitute(node.getLabel._3.getResult)).map(_.toProlog.dropRight(1)).mkString(","))
           }
-          !node.isRoot && (!stepByStep || { println("[PROLOGZ ENGINE] Other alternatives can be explored. Next/Accept? (N/A)")
+          !node.isRoot && (!stepByStep || { println("[PROLOG ENGINE] Other alternatives can be explored. Next/Accept? (N/A)")
             val in = readLine.toLowerCase; in == "n" || in == "next" })
         })
-      if(printTree) { println("[PROLOGZ ENGINE] Prolog tree created during resolution"); println(tree.toTree.drawTree) }
+      if(printTree) { println("[PROLOG ENGINE] Prolog tree created during resolution"); println(tree.toTree.drawTree) }
       println()
   }
 

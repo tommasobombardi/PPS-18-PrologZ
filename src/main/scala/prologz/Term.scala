@@ -2,6 +2,7 @@ package prologz
 
 import scalaz._
 import Scalaz._
+import scala.language.implicitConversions
 import prologz.Validation.{InputError, PzValidation}
 
 object Term {

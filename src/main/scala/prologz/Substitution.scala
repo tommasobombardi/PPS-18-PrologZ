@@ -2,6 +2,7 @@ package prologz
 
 import scalaz._
 import Scalaz._
+import scala.language.implicitConversions
 import prologz.Clause.{Fact, FactImpl, Rule, RuleImpl}
 import prologz.Term.{Struct, StructImpl, Term, Variable, VariableImpl}
 
