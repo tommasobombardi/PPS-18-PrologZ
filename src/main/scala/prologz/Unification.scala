@@ -40,9 +40,9 @@ private[prologz] object Unification {
     case ((v: Variable) :: _, (s: Struct) :: _) if s.args.getVariables.contains(v) => None // avoid endless loop (e.g. X can't be assigned to s(X))
     case ((s: Struct) :: _, (v: Variable) :: _) if s.args.getVariables.contains(v) => None // avoid endless loop (e.g. X can't be assigned to s(X))
     case ((s1: Struct) :: ft, (s2: Struct) :: gt) if s1.name == s2.name && s1.args.size == s2.args.size => unifyTerms(s1.args |+| ft, s2.args |+| gt, subs)
-    case ((v1: Variable) :: ft, (v2: Variable) :: gt) => unifyTerms(ft.substitute(v2, v1), gt.substitute(v2, v1), subs |+| (v2, v1))
-    case ((v: Variable) :: ft, (t: Term) :: gt) => unifyTerms(ft.substitute(v, t), gt.substitute(v, t), subs |+| (v, t))
-    case ((t: Term) :: ft, (v: Variable) :: gt) => unifyTerms(ft.substitute(v, t), gt.substitute(v, t), subs |+| (v, t))
+    case ((v1: Variable) :: ft, (v2: Variable) :: gt) => unifyTerms(ft.substitute(v2, v1), gt.substitute(v2, v1), subs + ((v2, v1)) )
+    case ((v: Variable) :: ft, (t: Term) :: gt) => unifyTerms(ft.substitute(v, t), gt.substitute(v, t), subs + ((v, t)))
+    case ((t: Term) :: ft, (v: Variable) :: gt) => unifyTerms(ft.substitute(v, t), gt.substitute(v, t), subs + ((v, t)))
     case (_ :: _, _) => None // theory and goal terms don't unify because they have different length
     case (_, _ :: _) => None // theory and goal terms don't unify because they have different length
     case _ => subs.some // successfully unified

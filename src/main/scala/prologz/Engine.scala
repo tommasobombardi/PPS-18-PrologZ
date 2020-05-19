@@ -2,10 +2,10 @@ package prologz
 
 import scalaz._
 import Scalaz._
+
 import scala.io.StdIn.readLine
 import prologz.Clause.{Clause, Fact}
 import prologz.Substitution._
-import prologz.Term.Variable
 import prologz.Unification._
 import prologz.Validation.{InputError, PzValidation, validateProgram}
 
@@ -34,8 +34,8 @@ object Engine {
     case (_, goals, subs) => tree.setLabel(Nil, goals, subs) // valid solution (in case of leaf node) or  execution completed (in case of root node)
   }
 
-  private implicit def showPrologTree(goalsVariables: Set[Variable]): Show[(List[Clause], List[Fact], Substitution)] = Show.shows(el => {
-    el._2.map(_.toProlog.dropRight(1)).mkString(",") + " || " + el._3.getResult(goalsVariables).toProlog
+  private implicit val showPrologTree: Show[(List[Clause], List[Fact], Substitution)] = Show.shows(el => {
+    el._2.map(_.toProlog.dropRight(1)).mkString(",") + " || " + el._3.getResult.toProlog
   })
 
   private def solveProgram(theory: List[PzValidation[Clause]], goals: List[PzValidation[Fact]], stepByStep: Boolean): Unit = validateProgram(theory, goals) match {
@@ -47,18 +47,17 @@ object Engine {
     case Success(p) =>
       solved += 1
       println("[PROLOGZ ENGINE] Resolution of program " + solved)
-      val tree: TreeLoc[(List[Clause], List[Fact], Substitution)] = constructPrologTree(p._1, (p._1, p._2, Substitution()).leaf.loc)
+      val tree: TreeLoc[(List[Clause], List[Fact], Substitution)] = constructPrologTree(p._1, (p._1, p._2, Substitution.base(p._2.getVariables)).leaf.loc)
         .whileDo(node => constructPrologTree(p._1, node.parent.get), /* backtracking (in case of leaf node with valid solution) */ node => {
           if (node.getLabel._2.nonEmpty) println("[PROLOGZ ENGINE] Execution completed, all alternatives have been explored")
           else {
-            val subs = node.getLabel._3.getResult(p._2.getVariables)
-            println("[PROLOGZ ENGINE] Available solution: " + subs.toProlog)
-            println("[PROLOGZ ENGINE] Available solution: " + p._2.map(_.substitute(subs)).map(_.toProlog.dropRight(1)).mkString(","))
+            println("[PROLOGZ ENGINE] Available solution: " + node.getLabel._3.getResult.toProlog)
+            println("[PROLOGZ ENGINE] Available solution: " + p._2.map(_.substitute(node.getLabel._3.getResult)).map(_.toProlog.dropRight(1)).mkString(","))
           }
           !node.isRoot && (!stepByStep || { println("[PROLOGZ ENGINE] Other alternatives can be explored. Next/Accept? (N/A)")
             val in = readLine.toLowerCase; in == "n" || in == "next" })
         })
-      if(printTree) { println("[PROLOGZ ENGINE] Prolog tree created during resolution"); println(tree.toTree.drawTree(p._2.getVariables)) }
+      if(printTree) { println("[PROLOGZ ENGINE] Prolog tree created during resolution"); println(tree.toTree.drawTree) }
       println()
   }
 
