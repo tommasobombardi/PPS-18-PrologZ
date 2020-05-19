@@ -2,7 +2,6 @@ package prologz
 
 import scalaz._
 import Scalaz._
-
 import scala.io.StdIn.readLine
 import prologz.Clause.{Clause, Fact}
 import prologz.Substitution._
@@ -24,13 +23,16 @@ object Engine {
 
   def solveAll(goals: PzValidation[Fact]*): Unit = solveProgram(theory, goals.toList, stepByStep = false)
 
+  private def createPrologTree(theory: List[Clause], goals: List[Fact]): TreeLoc[(List[Clause], List[Fact], Substitution)] =
+    (theory, goals, Substitution.base(goals.getVariables)).leaf.loc
+
   @scala.annotation.tailrec
-  private def constructPrologTree(theory: List[Clause], tree: TreeLoc[(List[Clause], List[Fact], Substitution)]): TreeLoc[(List[Clause], List[Fact], Substitution)] = tree.getLabel match {
+  private def navigatePrologTree(theory: List[Clause], tree: TreeLoc[(List[Clause], List[Fact], Substitution)]): TreeLoc[(List[Clause], List[Fact], Substitution)] = tree.getLabel match {
     case (clause :: otherClauses, goal :: otherGoals, subs) =>
       var currentNode: TreeLoc[(List[Clause], List[Fact], Substitution)] = tree.setLabel(otherClauses, goal :: otherGoals, subs)
       currentNode = clause.unify(goal, otherGoals).map(res => currentNode.insertDownLast((theory, res._2, subs |+| res._1).leaf)).getOrElse(currentNode)
-      constructPrologTree(theory, currentNode)
-    case (_, _ :: _, _) if tree.parent.isDefined => constructPrologTree(theory, tree.parent.get) // automatic backtracking (in case of leaf node without valid solution)
+      navigatePrologTree(theory, currentNode)
+    case (_, _ :: _, _) if tree.parent.isDefined => navigatePrologTree(theory, tree.parent.get) // automatic backtracking (in case of leaf node without valid solution)
     case (_, goals, subs) => tree.setLabel(Nil, goals, subs) // valid solution (in case of leaf node) or  execution completed (in case of root node)
   }
 
@@ -47,8 +49,8 @@ object Engine {
     case Success(p) =>
       solved += 1
       println("[PROLOGZ ENGINE] Resolution of program " + solved)
-      val tree: TreeLoc[(List[Clause], List[Fact], Substitution)] = constructPrologTree(p._1, (p._1, p._2, Substitution.base(p._2.getVariables)).leaf.loc)
-        .whileDo(node => constructPrologTree(p._1, node.parent.get), /* backtracking (in case of leaf node with valid solution) */ node => {
+      val tree: TreeLoc[(List[Clause], List[Fact], Substitution)] = navigatePrologTree(p._1, createPrologTree(p._1, p._2))
+        .whileDo(node => navigatePrologTree(p._1, node.parent.get), /* backtracking (in case of leaf node with valid solution) */ node => {
           if (node.getLabel._2.nonEmpty) println("[PROLOGZ ENGINE] Execution completed, all alternatives have been explored")
           else {
             println("[PROLOGZ ENGINE] Available solution: " + node.getLabel._3.getResult.toProlog)
