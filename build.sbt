@@ -4,4 +4,7 @@ version := "0.1"
 
 scalaVersion := "2.13.2"
 
+scalacOptions += "language:implicitConversions"
+scalacOptions += "language:postfixOps"
+
 libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.3.0"
