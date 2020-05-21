@@ -1,7 +1,7 @@
 package prologz.core
 
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class SubstitutionSpec extends FlatSpec {
+class SubstitutionSpec extends AnyFlatSpec {
 
 }

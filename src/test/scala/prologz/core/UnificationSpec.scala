@@ -1,7 +1,7 @@
 package prologz.core
 
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class UnificationSpec extends FlatSpec {
+class UnificationSpec extends AnyFlatSpec {
 
 }
