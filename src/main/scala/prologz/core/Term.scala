@@ -7,47 +7,41 @@ import prologz.core.Validation.{InputError, PzValidation}
 
 object Term {
 
-  /**
-   * General representation of a prolog term
-   */
+  /** General representation of a prolog term */
   sealed trait Term {
     /**
-     * @return corresponding prolog term
+     *  @return corresponding prolog term
      */
     def toProlog: String
   }
 
-  /**
-   * Representation of a constant prolog term
-   * @tparam A type of the constant prolog term
+  /** Representation of a constant prolog term
+   *
+   *  @tparam A type of the constant prolog term
    */
   sealed trait Atom[A] extends Term {
     /**
-     * @return value of the constant prolog term
+     *  @return value of the constant prolog term
      */
     def value: A
   }
 
-  /**
-   * Representation of a compound prolog term
-   */
+  /** Representation of a compound prolog term */
   sealed trait Struct extends Term {
     /**
-     * @return functor name of the compound prolog term
+     *  @return functor name of the compound prolog term
      */
     def name: String
     /**
-     * @return list of terms of the compound prolog term
+     *  @return list of terms of the compound prolog term
      */
     def args: List[Term]
   }
 
-  /**
-   * Representation of a variable prolog term
-   */
+  /** Representation of a variable prolog term */
   sealed trait Variable extends Term {
     /**
-     * @return name of the variable prolog term
+     *  @return name of the variable prolog term
      */
     def name: String
   }
