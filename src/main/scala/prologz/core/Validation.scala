@@ -3,11 +3,13 @@ package prologz.core
 import scalaz._
 import Scalaz._
 
+/** Prolog input error */
+sealed trait InputError
+
 /** Helpers for the validation of the prolog program */
 private[core] object Validation {
 
-  /** Prolog input error */
-  sealed trait InputError
+  type PzValidation[A] = ValidationNel[String @@ InputError, A]
 
   /** Creates a prolog input error
    *
@@ -15,8 +17,6 @@ private[core] object Validation {
    *  @return error tagged with prolog input error type
    */
   def InputError(message: String): String @@ InputError = Tag[String, InputError](message)
-
-  type PzValidation[A] = ValidationNel[String @@ InputError, A]
 
   /** Validates a prolog program
    *
