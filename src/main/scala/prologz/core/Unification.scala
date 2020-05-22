@@ -8,7 +8,6 @@ import prologz.core.Term.{Struct, Term, Variable}
 
 /**
  * Containing an implicit helper for [[prologz.core.Clause]] instances
- * With it clause instances can use a method unify, to be unified with a goal
  */
 private[core] object Unification {
 
