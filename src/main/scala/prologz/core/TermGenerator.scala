@@ -5,22 +5,9 @@ import Scalaz._
 import scala.language.implicitConversions
 import prologz.core.Validation.{InputError, PzValidation}
 
-object TermGenerator {
 
-  object Struct {
-    def apply(name: String): PzValidation[String @@ PzFunctor] = {
-      val nameVal1: PzValidation[String] =
-        if(name.nonEmpty) name.successNel
-        else InputError("An empty string is not valid to represent a compound term").failureNel
-      val nameVal2: PzValidation[String] =
-        if(name.toCharArray.forall(_.isLetter)) name.successNel
-        else InputError("String '" + name + "' is not valid to represent a compound term, because it doesn't contain only letters").failureNel
-      val nameVal3: PzValidation[String] =
-        if(name.nonEmpty && name.charAt(0).isLower) name.successNel
-        else InputError("String '" + name + "' is not valid to represent a compound term, because it doesn't start with a lowercase letter").failureNel
-      (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => Tag[String, PzFunctor](name))
-    }
-  }
+
+object TermGenerator {
 
   implicit class FunctorRich(base: PzValidation[String @@ PzFunctor]) {
     def apply(args: PzValidation[Term]*): PzValidation[Term] = {
