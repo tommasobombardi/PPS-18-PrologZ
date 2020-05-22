@@ -1,7 +1,6 @@
 package prologz.core
 
-import scalaz._
-import Scalaz._
+import scalaz.Monoid
 import scala.language.implicitConversions
 import prologz.core.PrologImplicits._
 
