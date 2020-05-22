@@ -4,7 +4,6 @@ import scalaz._
 import Scalaz._
 import scala.language.implicitConversions
 import prologz.core.Clause.{Fact, FactImpl, Rule, RuleImpl}
-import prologz.core.Term.{Struct, StructImpl, Term, Variable, VariableImpl}
 
 private[core] object Substitution {
 

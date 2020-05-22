@@ -1,8 +1,8 @@
 package prologz.examples
 
 import prologz.core.Clause.Predicate
-import prologz.core.Engine.{addTheory, setPrintTree, solve, solveAll}
-import prologz.core.Term.Struct
+import prologz.core.Engine.{addTheory, setPrintTree, solve}
+import prologz.core.TermGenerator._
 
 object Factorial extends App {
 

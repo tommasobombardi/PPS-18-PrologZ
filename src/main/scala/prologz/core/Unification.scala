@@ -4,7 +4,6 @@ import scalaz._
 import Scalaz._
 import prologz.core.Clause.{Clause, Fact, Rule}
 import prologz.core.Substitution._
-import prologz.core.Term.{Struct, Term, Variable}
 
 /** Implicit helper for [[prologz.core.Clause]] instances */
 private[core] object Unification {

@@ -3,7 +3,6 @@ package prologz.core
 import scalaz._
 import Scalaz._
 import scala.language.implicitConversions
-import prologz.core.Term.Term
 import prologz.core.Validation.{InputError, PzValidation}
 
 object Clause {
