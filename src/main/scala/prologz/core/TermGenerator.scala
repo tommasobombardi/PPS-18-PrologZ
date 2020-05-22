@@ -8,7 +8,7 @@ import prologz.core.Validation.{InputError, PzValidation}
 object TermGenerator {
 
   object Struct {
-    def apply(name: String): PzValidation[String @@ Compound] = {
+    def apply(name: String): PzValidation[String @@ PzFunctor] = {
       val nameVal1: PzValidation[String] =
         if(name.nonEmpty) name.successNel
         else InputError("An empty string is not valid to represent a compound term").failureNel
@@ -18,11 +18,11 @@ object TermGenerator {
       val nameVal3: PzValidation[String] =
         if(name.nonEmpty && name.charAt(0).isLower) name.successNel
         else InputError("String '" + name + "' is not valid to represent a compound term, because it doesn't start with a lowercase letter").failureNel
-      (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => Tag[String, Compound](name))
+      (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => Tag[String, PzFunctor](name))
     }
   }
 
-  implicit class FunctorRich(base: PzValidation[String @@ Compound]) {
+  implicit class FunctorRich(base: PzValidation[String @@ PzFunctor]) {
     def apply(args: PzValidation[Term]*): PzValidation[Term] = {
       val argsVal: PzValidation[List[Term]] =
         if(args.nonEmpty) args.foldLeft(List.empty[Term].successNel[String @@ InputError])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
