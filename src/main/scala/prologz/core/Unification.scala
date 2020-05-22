@@ -5,7 +5,7 @@ import Scalaz._
 import prologz.core.PrologImplicits._
 import prologz.core.Substitution._
 
-/** Implicit helpers for [[prologz.core.ClauseImplicits]] instances */
+/** Implicit helpers for [[prologz.core.Clause]] instances */
 private[core] object Unification {
 
   implicit class RichClause(base: Clause) {
