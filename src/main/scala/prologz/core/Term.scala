@@ -24,7 +24,7 @@ private[core] case class VariableImpl(override val name: String) extends Variabl
   override def toProlog: String = name
 }
 
-/** Functor useful to create a compound term */
+/** Prolog functor */
 sealed trait PzFunctor
 
 /** Compound term */

@@ -4,11 +4,11 @@ import scalaz._
 import Scalaz._
 import prologz.core.Validation.{InputError, PzValidation}
 
-/** Prolog predicate */
-sealed trait Predicate
-
 /** Prolog clause */
 sealed trait Clause { def toProlog: String }
+
+/** Prolog predicate */
+sealed trait Predicate
 
 /** Fact clause */
 sealed trait Fact extends Clause { def name: String; def args: List[Term] }

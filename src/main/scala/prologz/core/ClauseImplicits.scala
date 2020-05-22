@@ -9,7 +9,7 @@ import prologz.core.Validation.{InputError, PzValidation}
 object ClauseImplicits {
 
   implicit class PredicateRich(base: PzValidation[String @@ Predicate]) {
-    /** Creates a fact starting from a predicate (base)
+    /** Creates a fact, the instance of this class is the predicate
      *
      *  @param args terms, which still need to be validated
      *  @return the fact if there are no errors in args, errors list otherwise
@@ -22,7 +22,7 @@ object ClauseImplicits {
   }
 
   implicit class FactRich(base: PzValidation[Fact]) {
-    /** Creates a rule starting from a fact (base), which is the head of the rule
+    /** Creates a rule, the instance of this class is the head of the rule
      *
      *  @param facts body of the rule, which still need to be validated
      *  @return the rule if there are no errors in head or body, errors list otherwise

@@ -9,7 +9,7 @@ import prologz.core.Validation.{InputError, PzValidation}
 object TermImplicits {
 
   implicit class FunctorRich(base: PzValidation[String @@ PzFunctor]) {
-    /** Creates a compound term starting from a functor (base)
+    /** Creates a compound term, the instance of this class is the functor
      *
      *  @param args terms, which still need to be validated
      *  @return the compound term if there are no errors in args, errors list otherwise
