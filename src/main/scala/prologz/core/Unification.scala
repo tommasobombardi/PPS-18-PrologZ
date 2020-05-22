@@ -6,9 +6,20 @@ import prologz.core.Clause.{Clause, Fact, Rule}
 import prologz.core.Substitution._
 import prologz.core.Term.{Struct, Term, Variable}
 
+/**
+ * Containing an implicit helper for [[prologz.core.Clause]] instances
+ * With it clause instances can use a method unify, to be unified with a goal
+ */
 private[core] object Unification {
 
   implicit class RichClause(base: Clause) {
+    /**
+     * Unifies a theory clause (base) with a goal
+     *
+     * @param goal goal which is considered
+     * @param otherGoals other goals that must be solved
+     * @return resulting substitution and other goals after its application if clause unifies with goal, none otherwise
+     */
     def unify(goal: Fact, otherGoals: List[Fact]) : Option[(Substitution, List[Fact])] = base match {
       case fact: Fact => unifyFact(fact, goal, otherGoals)
       case rule: Rule => unifyRule(rule, goal, otherGoals)
@@ -34,6 +45,14 @@ private[core] object Unification {
       } yield subs)(rule)(goal :: otherGoals).map(_.swap)
   }
 
+  /**
+   * Unifies two terms lists (the first from a theory clause and the second from a goal)
+   *
+   * @param factTerms terms list contained in theory clause
+   * @param goalTerms terms list contained in goal clause
+   * @param subs substitution that has been performed until now
+   * @return resulting substitution if the terms lists unify, none otherwise
+   */
   @scala.annotation.tailrec
   private def unifyTerms(factTerms: List[Term], goalTerms: List[Term], subs: Substitution = Substitution()) : Option[Substitution] = (factTerms, goalTerms) match {
     case (f :: ft, g :: gt) if f == g => unifyTerms(ft, gt, subs)
