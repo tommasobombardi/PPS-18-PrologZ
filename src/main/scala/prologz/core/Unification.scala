@@ -7,7 +7,7 @@ import prologz.core.Substitution._
 import prologz.core.Term.{Struct, Term, Variable}
 
 /**
- * Containing an implicit helper for [[prologz.core.Clause]] instances
+ * Implicit helper for [[prologz.core.Clause]] instances
  */
 private[core] object Unification {
 
