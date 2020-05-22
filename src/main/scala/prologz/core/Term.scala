@@ -1,12 +1,7 @@
 package prologz.core
 
 /** General prolog term */
-sealed trait Term {
-  /**
-   *  @return corresponding prolog representation
-   */
-  def toProlog: String
-}
+sealed trait Term { def toProlog: String }
 
 /** Constant prolog term
  *
