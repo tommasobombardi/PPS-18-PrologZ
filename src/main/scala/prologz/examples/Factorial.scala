@@ -3,7 +3,7 @@ package prologz.examples
 import prologz.core.Clause.Predicate
 import prologz.core.Engine.{addTheory, setPrintTree, solve}
 import prologz.core.Struct
-import prologz.core.TermGenerator._
+import prologz.core.TermImplicits._
 
 object Factorial extends App {
 
