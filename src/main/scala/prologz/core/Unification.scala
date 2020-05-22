@@ -2,9 +2,10 @@ package prologz.core
 
 import scalaz._
 import Scalaz._
+import prologz.core.PrologImplicits._
 import prologz.core.Substitution._
 
-/** Implicit helper for [[prologz.core.ClauseImplicits]] instances */
+/** Implicit helpers for [[prologz.core.ClauseImplicits]] instances */
 private[core] object Unification {
 
   implicit class RichClause(base: Clause) {
