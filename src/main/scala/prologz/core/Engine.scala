@@ -8,19 +8,38 @@ import prologz.core.Substitution._
 import prologz.core.Unification._
 import prologz.core.Validation.{PzValidation, validateProgram}
 
+/** Prolog engine used to solve programs */
 object Engine {
 
   private var solved: Int = 0
   private var printTree: Boolean = false
   private var theory: List[PzValidation[Clause]] = Nil
 
+  /** Adds clauses to engine theory
+   *
+   *  @param clauses clauses which must be added to theory
+   */
   def addTheory(clauses: PzValidation[Clause]*): Unit = theory = theory |+| clauses.toList
+
+  /** Resets engine theory */
   def resetTheory(): Unit = theory = Nil
 
+  /** Enables or disables the print tree option
+   *
+   *  @param status true to show prolog tree after program resolution, false otherwise
+   */
   def setPrintTree(status: Boolean): Unit = printTree = status
 
+  /** Solves the program step by step
+   *
+   *  @param goals goals that must be solved
+   */
   def solve(goals: PzValidation[Fact]*): Unit = solveProgram(theory, goals.toList, stepByStep = true)
 
+  /** Solves the program in a single step
+   *
+   *  @param goals goals that must be solved
+   */
   def solveAll(goals: PzValidation[Fact]*): Unit = solveProgram(theory, goals.toList, stepByStep = false)
 
   private def createPrologTree(theory: List[Clause], goals: List[Fact]): TreeLoc[(List[Clause], List[Fact], Substitution)] =
