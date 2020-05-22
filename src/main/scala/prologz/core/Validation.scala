@@ -22,7 +22,7 @@ private[core] object Validation {
    *
    *  @param theory program theory clauses, which still need to be validated
    *  @param goals program goals, which still need to be validated
-   *  @return a tuple containing theory and goals if there are no errors in the program, errors list otherwise
+   *  @return a tuple containing theory and goals if there is no error in the program, errors list otherwise
    */
   def validateProgram(theory: List[PzValidation[Clause]], goals: List[PzValidation[Fact]]): PzValidation[(List[Clause], List[Fact])] = {
     val theoryReadableVal: List[PzValidation[Clause]] = theory.zipWithIndex.map({

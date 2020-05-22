@@ -29,7 +29,7 @@ object Predicate {
   /** Creates a predicate
    *
    *  @param name predicate name
-   *  @return predicate if there are no errors in name, errors list otherwise
+   *  @return predicate if there is no error in name, errors list otherwise
    */
   def apply(name: String): PzValidation[String @@ Predicate] = {
     val nameVal1: PzValidation[String] =

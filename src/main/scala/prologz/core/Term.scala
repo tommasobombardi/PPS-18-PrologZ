@@ -39,7 +39,7 @@ object Struct {
   /** Creates a functor
    *
    *  @param name functor name
-   *  @return functor if there are no errors in name, errors list otherwise
+   *  @return functor if there is no error in name, errors list otherwise
    */
   def apply(name: String): PzValidation[String @@ PzFunctor] = {
     val nameVal1: PzValidation[String] =
