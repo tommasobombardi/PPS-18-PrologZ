@@ -4,7 +4,7 @@ import scalaz._
 import Scalaz._
 import prologz.core.Validation.{InputError, PzValidation}
 
-/** General term */
+/** Prolog term */
 sealed trait Term { def toProlog: String }
 
 /** Constant term

@@ -2,7 +2,6 @@ package prologz.core
 
 import scalaz._
 import Scalaz._
-import prologz.core.Clause.{Clause, Fact}
 
 /** Helpers for the validation of the prolog program */
 private[core] object Validation {
