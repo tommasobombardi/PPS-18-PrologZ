@@ -34,7 +34,7 @@ private[core] case class StructImpl(override val name: String, override val args
   override def toProlog: String = name + "(" + args.map(_.toProlog).mkString(",") + ")"
 }
 
-/** Factory for [[String @@ prologz.core.PzFunctor]] instances */
+/** Factory for [[String @@ PzFunctor]] instances */
 object Struct {
   /** Creates a functor
    *

@@ -2,7 +2,7 @@ package prologz.examples
 
 import prologz.core.ClauseImplicits._
 import prologz.core.Engine.{addTheory, setPrintTree, solve}
-import prologz.core.Struct
+import prologz.core.{Predicate, Struct}
 import prologz.core.TermImplicits._
 
 object Factorial extends App {

@@ -11,7 +11,7 @@ object TermImplicits {
   implicit class FunctorRich(base: PzValidation[String @@ PzFunctor]) {
     /** Creates a compound term starting from a functor (base)
      *
-     *  @param args terms list, which still need to be validated
+     *  @param args terms, which still need to be validated
      *  @return the compound term if there are no errors in args, errors list otherwise
      */
     def apply(args: PzValidation[Term]*): PzValidation[Term] = {
