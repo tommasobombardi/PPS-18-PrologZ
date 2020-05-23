@@ -67,7 +67,7 @@ private[prologz] object Implicits {
     case _ => variables
   }
 
-  /** Rename variables in terms
+  /** Renames variables in terms
    *
    *  @param terms terms where variables must be renamed
    *  @param variables variables that must be renamed
@@ -85,7 +85,7 @@ private[prologz] object Implicits {
 
   /** Executes a single substitution in terms
    *
-   *  @param sub a variable and a term and representing the single substitution
+   *  @param sub a variable and a term representing the single substitution
    *  @param terms terms where the single substitution must be performed
    *  @return terms after applying the single substitution
    */

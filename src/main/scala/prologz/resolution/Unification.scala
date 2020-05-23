@@ -10,7 +10,7 @@ import prologz.resolution.Substitution.{fromTuple, Substitution}
 private[prologz] object Unification {
 
   implicit class RichClause(base: Clause) {
-    /** Unifies a theory clause (base) with a goal
+    /** Unifies a theory clause (the instance of this class) with a goal
      *
      *  @param goal goal which is considered
      *  @param otherGoals other goals that must be solved
@@ -44,7 +44,7 @@ private[prologz] object Unification {
   /** Unifies two terms lists (the first from a theory clause and the second from a goal)
    *
    *  @param factTerms terms list contained in theory clause
-   *  @param goalTerms terms list contained in goal clause
+   *  @param goalTerms terms list contained in goal
    *  @param subs substitution that has been performed until now
    *  @return resulting substitution if the terms lists unify, none otherwise
    */
