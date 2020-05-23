@@ -1,8 +1,8 @@
-package examples
+package samples
 
+import prologz.dsl._
 import prologz.dsl.ClauseImplicits._
-import prologz.dsl.Engine.{addTheory, setPrintTree, solve}
-import prologz.dsl.{Predicate, Struct}
+import prologz.dsl.Engine._
 import prologz.dsl.TermImplicits._
 
 object Factorial extends App {
