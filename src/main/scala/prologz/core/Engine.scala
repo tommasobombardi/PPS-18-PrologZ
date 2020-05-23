@@ -42,6 +42,9 @@ object Engine {
    */
   def solveAll(goals: PzValidation[Fact]*): Unit = solveProgram(theory, goals.toList, stepByStep = false)
 
+  private def findNextSolution(theory: List[Clause], tree: TreeLoc[(List[Clause], List[Fact], Substitution)]): TreeLoc[(List[Clause], List[Fact], Substitution)] =
+    if(tree.isRoot) navigatePrologTree(theory, tree) else navigatePrologTree(theory, tree.parent.get) // backtracking (in case of leaf node with valid solution)
+
   @scala.annotation.tailrec
   private def navigatePrologTree(theory: List[Clause], tree: TreeLoc[(List[Clause], List[Fact], Substitution)]): TreeLoc[(List[Clause], List[Fact], Substitution)] = tree.getLabel match {
     case (clause :: otherClauses, goal :: otherGoals, subs) =>
@@ -66,13 +69,13 @@ object Engine {
     case Success(p) =>
       solved += 1
       println("[PROLOG ENGINE] Resolution of program " + solved)
-      val tree: TreeLoc[(List[Clause], List[Fact], Substitution)] = navigatePrologTree(p._1, (p._1, p._2, Substitution.base(p._2.getVariables)).leaf.loc)
-        .whileDo(node => navigatePrologTree(p._1, node.parent.get), /* backtracking (in case of leaf node with valid solution) */ node => {
-          if (node.getLabel._2.nonEmpty) println("[PROLOG ENGINE] Execution completed, all alternatives have been explored")
-          else {
+      val tree: TreeLoc[(List[Clause], List[Fact], Substitution)] = (p._1, p._2, Substitution.base(p._2.getVariables)).leaf.loc
+        .doWhile(node => findNextSolution(p._1, node), node => {
+          if(node.getLabel._2.isEmpty) {
             println("[PROLOG ENGINE] Available solution: " + node.getLabel._3.getResult.toProlog)
             println("[PROLOG ENGINE] Available solution: " + p._2.map(_.substitute(node.getLabel._3.getResult)).map(_.toProlog.dropRight(1)).mkString(","))
           }
+          if(node.isRoot) println("[PROLOG ENGINE] Execution completed, all alternatives have been explored")
           !node.isRoot && (!stepByStep || { println("[PROLOG ENGINE] Other alternatives can be explored. Next/Accept? (N/A)")
             val in = readLine.toLowerCase; in == "n" || in == "next" })
         })
