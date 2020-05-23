@@ -9,7 +9,7 @@ import prologz.resolution.Substitution.{RichSubstitution, Substitution}
 import prologz.resolution.PrologTree.{initializePrologTree, searchPrologTree, showPrologTree}
 import prologz.resolution.Validation.{PzValidation, validateProgram}
 
-/** Prolog engine used to solve programs */
+/** Prolog engine */
 object Engine {
 
   private var solved: Int = 0

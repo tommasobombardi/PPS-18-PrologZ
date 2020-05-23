@@ -13,7 +13,7 @@ object TermImplicits {
     /** Creates a compound term, the instance of this class is the functor
      *
      *  @param args terms, which still need to be validated
-     *  @return the compound term if there is no error in args, errors list otherwise
+     *  @return the compound term if there is no error in functor or args, errors list otherwise
      */
     def apply(args: PzValidation[Term]*): PzValidation[Term] = {
       val argsVal: PzValidation[List[Term]] =
