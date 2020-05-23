@@ -19,11 +19,11 @@ private[prologz] object PrologTree {
   def initializePrologTree(theory: List[Clause], goals: List[Fact]): TreeLoc[(List[Clause], List[Fact], Substitution)] =
     (theory, goals, Substitution.base(goals.getVariables)).leaf.loc
 
-  /** Searches a valid solution navigating the prolog tree
+  /** Navigates the prolog tree until reaching a valid solution or the end of computation
    *
    *  @param theory theory of the prolog program
    *  @param tree initial tree or tree reached with last computation step
-   *  @return tree after reaching a valid solution or the end of the computation
+   *  @return tree after reaching a valid solution or the end of computation
    */
   def searchPrologTree(theory: List[Clause], tree: TreeLoc[(List[Clause], List[Fact], Substitution)]): TreeLoc[(List[Clause], List[Fact], Substitution)] =
     if(tree.isRoot) navigatePrologTree(theory, tree) else navigatePrologTree(theory, tree.parent.get) // backtracking (in case of leaf node with valid solution)

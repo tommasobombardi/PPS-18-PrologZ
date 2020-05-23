@@ -3,28 +3,28 @@ package prologz.resolution
 import scalaz._
 import Scalaz._
 import scala.language.implicitConversions
-import prologz.dsl.{Clause, Fact, FactImpl, Rule, RuleImpl, Struct, StructImpl, Term, Variable, VariableImpl}
+import prologz.dsl.{Fact, FactImpl, Rule, RuleImpl, Struct, StructImpl, Term, Variable, VariableImpl}
 import prologz.resolution.Substitution.Substitution
 
-/** Implicit helpers for [[Term]] and [[Clause]] instances */
+/** Implicit helpers for [[prologz.dsl.Clause]] and [[prologz.dsl.Clause]] instances */
 private[prologz] object Implicits {
 
   trait RichElement[A] {
     /** Retrieves variables
      *
-     *  @return all variables contained in this prolog element
+     *  @return all variables contained in the element
      */
     def getVariables: Set[Variable]
-    /** Renames selected variables
+    /** Renames variables in the element
      *
      *  @param variables variables that must be renamed
-     *  @return the prolog element after renaming selected variables
+     *  @return the element after renaming variables
      */
     def rename(variables: Set[Variable]): A
-    /** Executes a substitution
+    /** Executes substitution in the element
      *
      *  @param subs substitution that must be performed
-     *  @return the prolog element after the substitution
+     *  @return the element after applying substitution
      */
     def substitute(subs: Substitution): A
   }
@@ -53,6 +53,12 @@ private[prologz] object Implicits {
     override def substitute(subs: Substitution): Rule = RuleImpl(base.head.substitute(subs), base.body.map(_.substitute(subs)))
   }
 
+  /** Retrieves variables
+   *
+   *  @param terms terms which are considered
+   *  @param variables variables found until now
+   *  @return all variables contained in terms merged with variables already found
+   */
   @scala.annotation.tailrec
   private def getVariablesTerms(terms: List[Term], variables: Set[Variable] = Set()): Set[Variable] = terms match {
     case (v: Variable) :: other => getVariablesTerms(other, variables + v)
@@ -61,6 +67,14 @@ private[prologz] object Implicits {
     case _ => variables
   }
 
+  /** Rename variables in terms
+   *
+   *  @param terms terms where variables must be renamed
+   *  @param variables variables that must be renamed
+   *  @param notValidVars variables that can't be used for renaming
+   *  @param attempt index of current rename attempt
+   *  @return terms after renaming variables
+   */
   private def renameTerms(terms: List[Term], variables: Set[Variable], notValidVars: Set[Variable], attempt: Int = 1): List[Term] = terms match {
     case (v: Variable) :: _ if variables.contains(v) && notValidVars.contains(VariableImpl(v.name + ("'" * attempt))) => renameTerms(terms, variables, notValidVars, attempt + 1)
     case (v: Variable) :: other if variables.contains(v) => VariableImpl(v.name + ("'" * attempt)) :: renameTerms(other, variables, notValidVars)
@@ -69,6 +83,12 @@ private[prologz] object Implicits {
     case _ => Nil
   }
 
+  /** Executes a single substitution in terms
+   *
+   *  @param sub a tuple composed by a variable and a term and representing the single substitution
+   *  @param terms terms where the substitution must be performed
+   *  @return term after applying the single substitution
+   */
   private def substituteTerms(sub: (Variable, Term))(terms: List[Term]): List[Term] = terms match {
     case (v: Variable) :: other if v == sub._1 => sub._2 :: substituteTerms(sub)(other)
     case (s: Struct) :: other => StructImpl(s.name, substituteTerms(sub)(s.args)) :: substituteTerms(sub)(other)
