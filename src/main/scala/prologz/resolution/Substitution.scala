@@ -3,7 +3,7 @@ package prologz.resolution
 import scalaz.Monoid
 import scala.language.implicitConversions
 import prologz.dsl.{Term, Variable}
-import prologz.resolution.PrologImplicits._
+import prologz.resolution.Implicits._
 
 /** Factory for [[Substitution]] instances
  *  Implicit conversions and helpers for [[Substitution]] instances

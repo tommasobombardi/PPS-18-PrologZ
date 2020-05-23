@@ -7,7 +7,7 @@ import prologz.dsl.{Clause, Fact, FactImpl, Rule, RuleImpl, Struct, StructImpl, 
 import prologz.resolution.Substitution.Substitution
 
 /** Implicit helpers for [[Term]] and [[Clause]] instances */
-private[prologz] object PrologImplicits {
+private[prologz] object Implicits {
 
   trait RichElement[A] {
     /** Retrieves variables

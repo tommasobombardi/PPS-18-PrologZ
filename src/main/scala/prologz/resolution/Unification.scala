@@ -2,7 +2,7 @@ package prologz.resolution
 
 import scalaz._
 import Scalaz._
-import prologz.resolution.PrologImplicits._
+import prologz.resolution.Implicits._
 import prologz.resolution.Substitution._
 import prologz.dsl.{Clause, Fact, Rule, Struct, Term, Variable}
 

@@ -4,9 +4,9 @@ import scalaz._
 import Scalaz._
 import scala.io.StdIn.readLine
 import prologz.resolution.InputError
-import prologz.resolution.PrologImplicits._
+import prologz.resolution.Implicits._
 import prologz.resolution.Substitution._
-import prologz.resolution.TreeManager._
+import prologz.resolution.PrologTree._
 import prologz.resolution.Validation.{PzValidation, validateProgram}
 
 /** Prolog engine used to solve programs */

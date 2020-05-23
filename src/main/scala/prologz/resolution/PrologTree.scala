@@ -3,11 +3,11 @@ package prologz.resolution
 import scalaz._
 import Scalaz._
 import prologz.dsl.{Clause, Fact}
-import prologz.resolution.PrologImplicits._
+import prologz.resolution.Implicits._
 import prologz.resolution.Substitution._
 import prologz.resolution.Unification._
 
-private[prologz] object TreeManager {
+private[prologz] object PrologTree {
 
   def initializePrologTree(theory: List[Clause], goals: List[Fact]): TreeLoc[(List[Clause], List[Fact], Substitution)] =
     (theory, goals, Substitution.base(goals.getVariables)).leaf.loc
