@@ -85,9 +85,9 @@ private[prologz] object Implicits {
 
   /** Executes a single substitution in terms
    *
-   *  @param sub a tuple composed by a variable and a term and representing the single substitution
-   *  @param terms terms where the substitution must be performed
-   *  @return term after applying the single substitution
+   *  @param sub a variable and a term and representing the single substitution
+   *  @param terms terms where the single substitution must be performed
+   *  @return terms after applying the single substitution
    */
   private def substituteTerms(sub: (Variable, Term))(terms: List[Term]): List[Term] = terms match {
     case (v: Variable) :: other if v == sub._1 => sub._2 :: substituteTerms(sub)(other)
