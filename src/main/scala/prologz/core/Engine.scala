@@ -42,9 +42,6 @@ object Engine {
    */
   def solveAll(goals: PzValidation[Fact]*): Unit = solveProgram(theory, goals.toList, stepByStep = false)
 
-  private def createPrologTree(theory: List[Clause], goals: List[Fact]): TreeLoc[(List[Clause], List[Fact], Substitution)] =
-    (theory, goals, Substitution.base(goals.getVariables)).leaf.loc
-
   @scala.annotation.tailrec
   private def navigatePrologTree(theory: List[Clause], tree: TreeLoc[(List[Clause], List[Fact], Substitution)]): TreeLoc[(List[Clause], List[Fact], Substitution)] = tree.getLabel match {
     case (clause :: otherClauses, goal :: otherGoals, subs) =>
@@ -55,6 +52,7 @@ object Engine {
     case (_, goals, subs) => tree.setLabel(Nil, goals, subs) // valid solution (in case of leaf node) or  execution completed (in case of root node)
   }
 
+  /** Policy for tree drawing */
   private implicit val showPrologTree: Show[(List[Clause], List[Fact], Substitution)] = Show.shows(el => {
     el._2.map(_.toProlog.dropRight(1)).mkString(",") + " || " + el._3.getResult.toProlog
   })
@@ -68,7 +66,7 @@ object Engine {
     case Success(p) =>
       solved += 1
       println("[PROLOG ENGINE] Resolution of program " + solved)
-      val tree: TreeLoc[(List[Clause], List[Fact], Substitution)] = navigatePrologTree(p._1, createPrologTree(p._1, p._2))
+      val tree: TreeLoc[(List[Clause], List[Fact], Substitution)] = navigatePrologTree(p._1, (p._1, p._2, Substitution.base(p._2.getVariables)).leaf.loc)
         .whileDo(node => navigatePrologTree(p._1, node.parent.get), /* backtracking (in case of leaf node with valid solution) */ node => {
           if (node.getLabel._2.nonEmpty) println("[PROLOG ENGINE] Execution completed, all alternatives have been explored")
           else {
