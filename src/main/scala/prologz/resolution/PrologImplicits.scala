@@ -1,12 +1,13 @@
-package prologz.core
+package prologz.resolution
 
 import scalaz._
 import Scalaz._
 import scala.language.implicitConversions
-import prologz.core.Substitution.Substitution
+import prologz.dsl.{Clause, Fact, FactImpl, Rule, RuleImpl, Struct, StructImpl, Term, Variable, VariableImpl}
+import prologz.resolution.Substitution.Substitution
 
-/** Implicit helpers for [[prologz.core.Term]] and [[prologz.core.Clause]] instances */
-private[core] object PrologImplicits {
+/** Implicit helpers for [[Term]] and [[Clause]] instances */
+private[prologz] object PrologImplicits {
 
   trait RichElement[A] {
     /** Retrieves variables

@@ -1,12 +1,13 @@
-package prologz.core
+package prologz.dsl
 
 import scalaz._
 import Scalaz._
 import scala.io.StdIn.readLine
-import prologz.core.PrologImplicits._
-import prologz.core.Substitution._
-import prologz.core.TreeManager.{initializePrologTree, searchPrologTree, showPrologTree}
-import prologz.core.Validation.{PzValidation, validateProgram}
+import prologz.resolution.InputError
+import prologz.resolution.PrologImplicits._
+import prologz.resolution.Substitution._
+import prologz.resolution.TreeManager._
+import prologz.resolution.Validation.{PzValidation, validateProgram}
 
 /** Prolog engine used to solve programs */
 object Engine {

@@ -1,13 +1,14 @@
-package prologz.core
+package prologz.resolution
 
 import scalaz._
 import Scalaz._
+import prologz.dsl.{Clause, Fact}
 
 /** Prolog input error */
 sealed trait InputError
 
 /** Helpers for the validation of the prolog program */
-private[core] object Validation {
+private[prologz] object Validation {
 
   type PzValidation[A] = ValidationNel[String @@ InputError, A]
 

@@ -1,12 +1,13 @@
-package prologz.core
+package prologz.resolution
 
 import scalaz._
 import Scalaz._
-import prologz.core.PrologImplicits._
-import prologz.core.Substitution._
+import prologz.resolution.PrologImplicits._
+import prologz.resolution.Substitution._
+import prologz.dsl.{Clause, Fact, Rule, Struct, Term, Variable}
 
-/** Implicit helpers for [[prologz.core.Clause]] instances */
-private[core] object Unification {
+/** Implicit helpers for [[Clause]] instances */
+private[prologz] object Unification {
 
   implicit class RichClause(base: Clause) {
     /** Unifies a theory clause (base) with a goal

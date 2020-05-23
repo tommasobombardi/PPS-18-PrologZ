@@ -1,13 +1,14 @@
-package prologz.core
+package prologz.resolution
 
 import scalaz.Monoid
 import scala.language.implicitConversions
-import prologz.core.PrologImplicits._
+import prologz.dsl.{Term, Variable}
+import prologz.resolution.PrologImplicits._
 
 /** Factory for [[Substitution]] instances
  *  Implicit conversions and helpers for [[Substitution]] instances
  */
-private[core] object Substitution {
+private[prologz] object Substitution {
 
   type Substitution = Map[Variable, Term]
 

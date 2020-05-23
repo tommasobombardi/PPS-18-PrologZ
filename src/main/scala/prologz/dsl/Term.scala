@@ -1,8 +1,8 @@
-package prologz.core
+package prologz.dsl
 
 import scalaz._
 import Scalaz._
-import prologz.core.Validation.{InputError, PzValidation}
+import prologz.resolution.Validation.{InputError, PzValidation}
 
 /** Prolog term */
 sealed trait Term { def toProlog: String }
@@ -13,14 +13,14 @@ sealed trait Term { def toProlog: String }
  */
 sealed trait Atom[A] extends Term { def value: A }
 
-private[core] case class AtomImpl[A](override val value: A) extends Atom[A] {
+private[prologz] case class AtomImpl[A](override val value: A) extends Atom[A] {
   override def toProlog: String = value.toString
 }
 
 /** Variable term */
 sealed trait Variable extends Term { def name: String }
 
-private[core] case class VariableImpl(override val name: String) extends Variable {
+private[prologz] case class VariableImpl(override val name: String) extends Variable {
   override def toProlog: String = name
 }
 
@@ -30,7 +30,7 @@ sealed trait PzFunctor
 /** Compound term */
 sealed trait Struct extends Term { def name: String; def args: List[Term] }
 
-private[core] case class StructImpl(override val name: String, override val args: List[Term]) extends Struct {
+private[prologz] case class StructImpl(override val name: String, override val args: List[Term]) extends Struct {
   override def toProlog: String = name + "(" + args.map(_.toProlog).mkString(",") + ")"
 }
 

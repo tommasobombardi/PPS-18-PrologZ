@@ -1,11 +1,12 @@
-package prologz.core
+package prologz.dsl
 
 import scalaz._
 import Scalaz._
 import scala.language.implicitConversions
-import prologz.core.Validation.{InputError, PzValidation}
+import prologz.resolution.InputError
+import prologz.resolution.Validation.{InputError, PzValidation}
 
-/** Implicit conversions and helpers for [[prologz.core.Term]] instances */
+/** Implicit conversions and helpers for [[prologz.dsl.Term]] instances */
 object TermImplicits {
 
   implicit class FunctorRich(base: PzValidation[String @@ PzFunctor]) {

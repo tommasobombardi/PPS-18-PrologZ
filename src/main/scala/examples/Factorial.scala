@@ -1,9 +1,9 @@
 package examples
 
-import prologz.core.ClauseImplicits._
-import prologz.core.Engine.{addTheory, setPrintTree, solve}
-import prologz.core.{Predicate, Struct}
-import prologz.core.TermImplicits._
+import prologz.dsl.ClauseImplicits._
+import prologz.dsl.Engine.{addTheory, setPrintTree, solve}
+import prologz.dsl.{Predicate, Struct}
+import prologz.dsl.TermImplicits._
 
 object Factorial extends App {
 
