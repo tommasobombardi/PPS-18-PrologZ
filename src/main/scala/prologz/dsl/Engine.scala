@@ -3,10 +3,10 @@ package prologz.dsl
 import scalaz._
 import Scalaz._
 import scala.io.StdIn.readLine
+import prologz.resolution.Implicits.RichFactList
 import prologz.resolution.InputError
-import prologz.resolution.Implicits._
-import prologz.resolution.Substitution._
-import prologz.resolution.PrologTree._
+import prologz.resolution.Substitution.{RichSubstitution, Substitution}
+import prologz.resolution.PrologTree.{initializePrologTree, searchPrologTree, showPrologTree}
 import prologz.resolution.Validation.{PzValidation, validateProgram}
 
 /** Prolog engine used to solve programs */
@@ -56,7 +56,7 @@ object Engine {
         .doWhile(node => searchPrologTree(p._1, node), node => {
           if(node.getLabel._2.isEmpty) {
             println("[PROLOG ENGINE] Available solution: " + node.getLabel._3.getResult.toProlog)
-            println("[PROLOG ENGINE] Available solution: " + p._2.map(_.substitute(node.getLabel._3.getResult)).map(_.toProlog.dropRight(1)).mkString(","))
+            println("[PROLOG ENGINE] Available solution: " + p._2.substitute(node.getLabel._3.getResult).map(_.toProlog.dropRight(1)).mkString(","))
           }
           if(node.isRoot) println("[PROLOG ENGINE] Execution completed, all alternatives have been explored")
           !node.isRoot && (!stepByStep || { println("[PROLOG ENGINE] Other alternatives can be explored. Next/Accept? (N/A)")

@@ -3,9 +3,9 @@ package prologz.resolution
 import scalaz._
 import Scalaz._
 import prologz.dsl.{Clause, Fact}
-import prologz.resolution.Implicits._
-import prologz.resolution.Substitution._
-import prologz.resolution.Unification._
+import prologz.resolution.Implicits.RichFactList
+import prologz.resolution.Substitution.{RichSubstitution, Substitution, substitutionMonoid}
+import prologz.resolution.Unification.RichClause
 
 private[prologz] object PrologTree {
 
