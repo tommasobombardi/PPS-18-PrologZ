@@ -1,4 +1,4 @@
-package prologz.examples
+package examples
 
 import prologz.core.ClauseImplicits._
 import prologz.core.Engine.{addTheory, setPrintTree, solve}
