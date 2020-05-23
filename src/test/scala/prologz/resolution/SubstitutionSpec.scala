@@ -1,4 +1,4 @@
-package prologz.core
+package prologz.resolution
 
 import org.scalatest.flatspec.AnyFlatSpec
 
