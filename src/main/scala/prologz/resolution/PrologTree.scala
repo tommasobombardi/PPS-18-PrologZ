@@ -7,11 +7,24 @@ import prologz.resolution.Implicits.RichFactList
 import prologz.resolution.Substitution.{RichSubstitution, Substitution, substitutionMonoid}
 import prologz.resolution.Unification.RichClause
 
+/** Helpers for prolog tree construction */
 private[prologz] object PrologTree {
 
+  /** Creates a prolog tree
+   *
+   *  @param theory theory of the prolog program
+   *  @param goals goals of the prolog program
+   *  @return tree containing only the root node, with theory, goals and an identity substitution
+   */
   def initializePrologTree(theory: List[Clause], goals: List[Fact]): TreeLoc[(List[Clause], List[Fact], Substitution)] =
     (theory, goals, Substitution.base(goals.getVariables)).leaf.loc
 
+  /** Searches a valid solution navigating the prolog tree
+   *
+   *  @param theory theory of the prolog program
+   *  @param tree initial tree or tree reached with last computation step
+   *  @return tree after reaching a valid solution or the end of the computation
+   */
   def searchPrologTree(theory: List[Clause], tree: TreeLoc[(List[Clause], List[Fact], Substitution)]): TreeLoc[(List[Clause], List[Fact], Substitution)] =
     if(tree.isRoot) navigatePrologTree(theory, tree) else navigatePrologTree(theory, tree.parent.get) // backtracking (in case of leaf node with valid solution)
 

@@ -7,7 +7,7 @@ import prologz.dsl.{Clause, Fact}
 /** Prolog input error */
 sealed trait InputError
 
-/** Helpers for the validation of the prolog program */
+/** Helpers for prolog program validation */
 private[prologz] object Validation {
 
   type PzValidation[A] = ValidationNel[String @@ InputError, A]
