@@ -49,8 +49,8 @@ private[prologz] object Implicits {
 
   implicit class RichRule(base: Rule) extends RichElement[Rule] {
     override def getVariables: Set[Variable] = base.head.getVariables |+| base.body.getVariables
-    override def rename(variables: Set[Variable]): Rule = RuleImpl(base.head.rename(variables), base.body.map(_.rename(variables)))
-    override def substitute(subs: Substitution): Rule = RuleImpl(base.head.substitute(subs), base.body.map(_.substitute(subs)))
+    override def rename(variables: Set[Variable]): Rule = RuleImpl(base.head.rename(variables), base.body.rename(variables))
+    override def substitute(subs: Substitution): Rule = RuleImpl(base.head.substitute(subs), base.body.substitute(subs))
   }
 
   /** Retrieves variables
