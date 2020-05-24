@@ -29,7 +29,7 @@ trait Utils {
     Predicate("Sum")("X4", 0, "X"),
     Predicate("sum")("X", Struct("Ss")("Y"), Struct("s")("Z++")) :- Predicate("sum")("X", "Y.", "Z"),
     Predicate("mul")("X", 0, 0),
-    Predicate("mul")("X", Struct("s")("Y"), "Z") :- (Predicate("Mul")("X", "Y", "W"), Predicate("sum")("Xè", "W", "Z"))) // 7 errors
+    Predicate("mul")("X", Struct("s")(":Y"), "Z") :- (Predicate("Mul")("X", "Y", "W"), Predicate("sum")("Xè", "W", "Z"))) // 7 errors
 
   val mulGoalsWithErrors: List[PzValidation[Fact]] = List(Predicate("Mul")(Struct("s")(Struct("s1")(0)), Struct("S")(Struct("s")(0)), "Y_")) // 4 errors
 
