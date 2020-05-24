@@ -12,18 +12,18 @@ object Relationship extends App {
   val male = Predicate("male")
 
   Engine.addTheory(
-    son("X", "Y") :- (father("Y", "X"), male("X")),
-    grandfather("X", "Z") :- (father("X", "Y"), father("Y", "Z")),
-    father("abraham", "isaac"),
-    father("terach", "abraham"),
+    son("X","Y") :- (father("Y","X"), male("X")),
+    grandfather("X","Z") :- (father("X","Y"), father("Y","Z")),
+    father("abraham","isaac"),
+    father("terach","abraham"),
     male("isaac"),
     male("abraham"),
     male("terach"))
 
   Engine.setPrintTree(true)
 
-  Engine.solveAll(grandfather("terach", "isaac"))
-  Engine.solveAll(grandfather("terach", "X"))
-  Engine.solveAll(son("X", "Y"))
+  Engine.solveAll(grandfather("terach","isaac"))
+  Engine.solveAll(grandfather("terach","X"))
+  Engine.solveAll(son("X","Y"))
 
 }

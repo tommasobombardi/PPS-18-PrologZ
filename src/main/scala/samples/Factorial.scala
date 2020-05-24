@@ -23,7 +23,7 @@ object Factorial extends App {
   Engine.setPrintTree(true)
 
   Engine.solve(mul(s(0),s(0),"Y"))
-  Engine.solve(mul(s(s(s(s((0))))),s(s(s(0))),"Y"))
-  Engine.solve(factorial(s(s(s((s(0))))),"Y"))
+  Engine.solve(mul(s(s(s(s(0)))),s(s(s(0))),"Y"))
+  Engine.solve(factorial(s(s(s(s(0)))),"Y"))
 
 }
