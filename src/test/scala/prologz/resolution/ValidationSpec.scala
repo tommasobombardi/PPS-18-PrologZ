@@ -9,7 +9,7 @@ import prologz.utils.Utils
 
 class ValidationSpec extends AnyFlatSpec with Matchers with Utils {
 
-  "The validate method" should "transform a valid program in its validated version" in {
+  "Applying validation to a program" should "transform a valid program in its validated version" in {
     validateProgram(mulTheoryNoErrors, mulGoalsNoErrors)getOrElse((Nil, Nil)) shouldBe (mulTheory, mulGoals)
     validateProgram(relTheoryNoErrors, relGoalsNoErrors).getOrElse((Nil, Nil)) shouldBe (relTheory, relGoals)
   }
