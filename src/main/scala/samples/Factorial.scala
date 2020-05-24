@@ -2,7 +2,6 @@ package samples
 
 import prologz.dsl._
 import prologz.dsl.ClauseImplicits._
-import prologz.dsl.Engine._
 import prologz.dsl.TermImplicits._
 
 object Factorial extends App {
@@ -12,7 +11,7 @@ object Factorial extends App {
   val mul = Predicate("mul")
   val factorial = Predicate("factorial")
 
-  addTheory(
+  Engine.addTheory(
     sum("X",0,"X"),
     sum("X",s("Y"),s("Z")) :- sum("X","Y","Z"),
     mul("X",0,0),
@@ -21,10 +20,10 @@ object Factorial extends App {
     factorial(s("X"),"Y") :- (factorial("X","Z"), mul(s("X"),"Z","Y")),
     factorial(s(0),s(0)))
 
-  setPrintTree(true)
+  Engine.setPrintTree(true)
 
-  solve(mul(s(0),s(0),"Y"))
-  solve(mul(s(s(s(s((0))))),s(s(s(0))),"Y"))
-  solve(factorial(s(s(s((s(0))))),"Y"))
+  Engine.solve(mul(s(0),s(0),"Y"))
+  Engine.solve(mul(s(s(s(s((0))))),s(s(s(0))),"Y"))
+  Engine.solve(factorial(s(s(s((s(0))))),"Y"))
 
 }
