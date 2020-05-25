@@ -1,4 +1,4 @@
-package utils
+package prologz.utils
 
 import prologz.dsl.{AtomImpl, Clause, Fact, FactImpl, RuleImpl, StructImpl, VariableImpl}
 

@@ -6,7 +6,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import prologz.dsl.{AtomImpl, Fact, FactImpl, Rule, StructImpl, VariableImpl}
 import prologz.resolution.Unification.RichClause
-import utils.PrologSamples
+import prologz.utils.PrologSamples
 
 class UnificationSpec extends AnyFlatSpec with Matchers with PrologSamples {
 

@@ -8,7 +8,7 @@ import prologz.dsl.{Predicate, Struct}
 import prologz.dsl.ClauseImplicits.{FactRich, PredicateRich}
 import prologz.dsl.TermImplicits.{FunctorRich, fromInt, fromString}
 import prologz.resolution.Validation.{InputError, validateProgram}
-import utils.PrologSamples
+import prologz.utils.PrologSamples
 
 class ValidationSpec extends AnyFlatSpec with Matchers with PrologSamples {
 
