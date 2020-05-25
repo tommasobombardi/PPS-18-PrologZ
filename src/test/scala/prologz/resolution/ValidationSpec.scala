@@ -4,10 +4,29 @@ import scalaz._
 import Scalaz._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import prologz.dsl.{Predicate, Struct}
+import prologz.dsl.ClauseImplicits.{FactRich, PredicateRich}
+import prologz.dsl.TermImplicits.{FunctorRich, fromInt, fromString}
 import prologz.resolution.Validation.{InputError, validateProgram}
 import prologz.utils.Utils
 
 class ValidationSpec extends AnyFlatSpec with Matchers with Utils {
+
+  private val mulTheoryNoErrors = List(Predicate("sum")("X", 0, "X"), Predicate("sum")("X", Struct("s")("Y"), Struct("s")("Z")) :- Predicate("sum")("X", "Y", "Z"),
+    Predicate("mul")("X", 0, 0), Predicate("mul")("X", Struct("s")("Y"), "Z") :- (Predicate("mul")("X", "Y", "W"), Predicate("sum")("X", "W", "Z")))
+  private val mulGoalsNoErrors = List(Predicate("mul")(Struct("s")(Struct("s")(0)), Struct("s")(Struct("s")(0)), "Y"))
+
+  private val relTheoryNoErrors = List(Predicate("son")("X", "Y") :- (Predicate("father")("Y", "X"), Predicate("male")("X")),
+    Predicate("father")("abraham", "isaac"), Predicate("father")("terach", "abraham"), Predicate("male")("isaac"), Predicate("male")("abraham"), Predicate("male")("terach"))
+  private val relGoalsNoErrors = List(Predicate("son")("X", "Y"))
+
+  private val mulTheoryWithErrors = List(Predicate("Sum")("X4", 0, "X"), Predicate("sum")("X", Struct("Ss")("Y"), Struct("s")("Z++")) :- Predicate("sum")("X", "Y.", "Z"),
+    Predicate("mul")("X", 0, 0), Predicate("mul")("X", Struct("s")(":Y"), "Z") :- (Predicate("Mul")("X", "Y", "W"), Predicate("sum")("Xè", "W", "Z"))) // 7 errors
+  private val mulGoalsWithErrors = List(Predicate("Mul")(Struct("s")(Struct("s1")(0)), Struct("S")(Struct("s")(0)), "Y_")) // 4 errors
+
+  private val relTheoryWithErrors = List(Predicate("son")("X", "Y") :- (Predicate("father//")("Y", "X"), Predicate("male")("X")), Predicate("father")("abraham3", "isaac"),
+    Predicate("father")("terach", "abraham"), Predicate("male_")("isaac"), Predicate("male")("abraham"), Predicate("male")("terach")) // 3 errors
+  private val relGoalsWithErrors = List(Predicate("Son")("X", "34Y")) // 2 errors
 
   "Applying validation to a program" should "transform a valid program in its validated version" in {
     validateProgram(mulTheoryNoErrors, mulGoalsNoErrors)getOrElse((Nil, Nil)) shouldBe (mulTheory, mulGoals)
