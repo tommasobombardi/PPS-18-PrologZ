@@ -35,7 +35,7 @@ class UnificationSpec extends AnyFlatSpec with Matchers with Utils {
     for(theory <- relTheoryFacts; goal <- relGoals if theory.args.size != goal.args.size) theory.unify(goal, Nil) shouldBe None
   }
 
-  it should "unify with a goal having the same predicate name and all arguments that unify, retrieving the right substitution" in {
+  it should "unify with a goal having the same predicate name and all arguments that unify, retrieving the proper substitution" in {
     mulTheoryFacts(1).unify(otherMulGoal, Nil) shouldBe (otherMulGoalRes, Nil).some
     relTheoryFacts.head.unify(otherRelGoal, Nil) shouldBe (otherRelGoalRes, Nil).some
   }
@@ -50,7 +50,7 @@ class UnificationSpec extends AnyFlatSpec with Matchers with Utils {
     for(theory <- relTheoryRules; goal <- relGoals if theory.head.args.size != goal.args.size) theory.unify(goal, Nil) shouldBe None
   }
 
-  it should "unify with a goal having the same predicate name of its head and all arguments that unify, retrieving the right substitution" in {
+  it should "unify with a goal having the same predicate name of its head and all arguments that unify, retrieving the proper substitution" in {
     mulTheoryRules(1).unify(mulGoals.head, Nil).map(_._1) shouldBe mulGoalRes.some
     relTheoryRules.head.unify(relGoals.head, Nil).map(_._1) shouldBe relGoalRes.some
   }
