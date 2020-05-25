@@ -29,6 +29,7 @@ class PrologTreeSpec extends AnyFlatSpec with Matchers with PrologSamples {
     mulTreeStep2.map(_._2) should (be a Symbol("isRoot") or have(Symbol("getLabel")(Nil)))
     val mulTreeStep3 = searchPrologTree(mulTheory, mulTreeStep2)
     mulTreeStep3.map(_._2) should (be a Symbol("isRoot") or have(Symbol("getLabel")(Nil)))
+
     val relTreeInitial = initializePrologTree(relTheory, relGoals)
     val relTreeStep1 = searchPrologTree(mulTheory, relTreeInitial)
     relTreeStep1.map(_._2) should (be a Symbol("isRoot") or have(Symbol("getLabel")(Nil)))
