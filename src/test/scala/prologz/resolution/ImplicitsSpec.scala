@@ -1,49 +1,40 @@
 package prologz.resolution
 
 import org.scalatest.flatspec.AnyFlatSpec
-import prologz.dsl.{AtomImpl, Clause, FactImpl, RuleImpl, StructImpl, VariableImpl}
+import prologz.dsl.{AtomImpl, FactImpl, RuleImpl, StructImpl, Variable, VariableImpl}
 import prologz.resolution.Implicits.{RichFact, RichFactList, RichRule, RichTermList}
 import prologz.utils.TestUtils
 
 class ImplicitsSpec extends AnyFlatSpec with TestUtils {
 
-  val mulTheoryVariables: List[Clause] = List(FactImpl("sum", List(VariableImpl("X"), AtomImpl(0), VariableImpl("X"))),
-    RuleImpl(FactImpl("sum", List(VariableImpl("X"), StructImpl("s", List(VariableImpl("Y"))), StructImpl("s", List(VariableImpl("Z"))))),
-      List(FactImpl("sum", List(VariableImpl("X"), VariableImpl("Y"), VariableImpl("Z"))))),
-    FactImpl("mul", List(VariableImpl("X"), AtomImpl(0), AtomImpl(0))),
-    RuleImpl(FactImpl("mul", List(VariableImpl("X"), StructImpl("s", List(VariableImpl("Y"))), VariableImpl("Z"))),
-      List(FactImpl("mul", List(VariableImpl("X"), VariableImpl("Y"), VariableImpl("W"))), FactImpl("sum", List(VariableImpl("X"), VariableImpl("W"), VariableImpl("Z"))))))
+  private val variablesToRename: Set[Variable] = Set(VariableImpl("X"), VariableImpl("Y"),  VariableImpl("Z"))
+  private val substitution = Substitution(VariableImpl("X") -> AtomImpl(1), VariableImpl("Y") -> StructImpl("s", List(VariableImpl("Z"))), VariableImpl("Z") -> VariableImpl("Y'"))
 
-  val relTheoryVariables: List[Clause] = List(RuleImpl(FactImpl("son", List(VariableImpl("X"), VariableImpl("Y"))),
-      List(FactImpl("father", List(VariableImpl("Y"), VariableImpl("X"))), FactImpl("male", List(VariableImpl("X"))))),
+  private val relTheoryVariables = List(Set(VariableImpl("X"), VariableImpl("Y")), Set(), Set(), Set(), Set(), Set())
+  private val mulTheoryVariables = List(Set(VariableImpl("X")), Set(VariableImpl("X"), VariableImpl("Y"), VariableImpl("Z")),
+    Set(VariableImpl("X")), Set(VariableImpl("X"), VariableImpl("Y"), VariableImpl("Z"), VariableImpl("W")))
+
+  private val relTheoryRenamed = List(RuleImpl(FactImpl("son", List(VariableImpl("X'"), VariableImpl("Y'"))),
+    List(FactImpl("father", List(VariableImpl("Y'"), VariableImpl("X'"))), FactImpl("male", List(VariableImpl("X'"))))),
     FactImpl("father", List(AtomImpl("abraham"), AtomImpl("isaac"))), FactImpl("father", List(AtomImpl("terach"), AtomImpl("abraham"))),
     FactImpl("male", List(AtomImpl("isaac"))), FactImpl("male", List(AtomImpl("abraham"))), FactImpl("male", List(AtomImpl("terach"))))
+  private val mulTheoryRenamed = List(FactImpl("sum", List(VariableImpl("X'"), AtomImpl(0), VariableImpl("X'"))),
+    RuleImpl(FactImpl("sum", List(VariableImpl("X'"), StructImpl("s", List(VariableImpl("Y'"))), StructImpl("s", List(VariableImpl("Z'"))))),
+      List(FactImpl("sum", List(VariableImpl("X'"), VariableImpl("Y'"), VariableImpl("Z'"))))),
+    FactImpl("mul", List(VariableImpl("X'"), AtomImpl(0), AtomImpl(0))),
+    RuleImpl(FactImpl("mul", List(VariableImpl("X'"), StructImpl("s", List(VariableImpl("Y'"))), VariableImpl("Z'"))),
+      List(FactImpl("mul", List(VariableImpl("X'"), VariableImpl("Y'"), VariableImpl("W"))), FactImpl("sum", List(VariableImpl("X'"), VariableImpl("W"), VariableImpl("Z'"))))))
 
-
-  val mulTheoryRenamed: List[Clause] = List(FactImpl("sum", List(VariableImpl("X"), AtomImpl(0), VariableImpl("X"))),
-    RuleImpl(FactImpl("sum", List(VariableImpl("X"), StructImpl("s", List(VariableImpl("Y"))), StructImpl("s", List(VariableImpl("Z"))))),
-      List(FactImpl("sum", List(VariableImpl("X"), VariableImpl("Y"), VariableImpl("Z"))))),
-    FactImpl("mul", List(VariableImpl("X"), AtomImpl(0), AtomImpl(0))),
-    RuleImpl(FactImpl("mul", List(VariableImpl("X"), StructImpl("s", List(VariableImpl("Y"))), VariableImpl("Z"))),
-      List(FactImpl("mul", List(VariableImpl("X"), VariableImpl("Y"), VariableImpl("W"))), FactImpl("sum", List(VariableImpl("X"), VariableImpl("W"), VariableImpl("Z"))))))
-
-  val relTheoryRenamed: List[Clause] = List(RuleImpl(FactImpl("son", List(VariableImpl("X"), VariableImpl("Y"))),
-    List(FactImpl("father", List(VariableImpl("Y"), VariableImpl("X"))), FactImpl("male", List(VariableImpl("X"))))),
+  private val relTheorySubstituted = List(RuleImpl(FactImpl("son", List(AtomImpl(1), StructImpl("s", List(VariableImpl("Y'"))))),
+    List(FactImpl("father", List(StructImpl("s", List(VariableImpl("Y'"))), AtomImpl(1))), FactImpl("male", List(AtomImpl(1))))),
     FactImpl("father", List(AtomImpl("abraham"), AtomImpl("isaac"))), FactImpl("father", List(AtomImpl("terach"), AtomImpl("abraham"))),
     FactImpl("male", List(AtomImpl("isaac"))), FactImpl("male", List(AtomImpl("abraham"))), FactImpl("male", List(AtomImpl("terach"))))
-
-
-  val mulTheorySubstituted: List[Clause] = List(FactImpl("sum", List(VariableImpl("X"), AtomImpl(0), VariableImpl("X"))),
-    RuleImpl(FactImpl("sum", List(VariableImpl("X"), StructImpl("s", List(VariableImpl("Y"))), StructImpl("s", List(VariableImpl("Z"))))),
-      List(FactImpl("sum", List(VariableImpl("X"), VariableImpl("Y"), VariableImpl("Z"))))),
-    FactImpl("mul", List(VariableImpl("X"), AtomImpl(0), AtomImpl(0))),
-    RuleImpl(FactImpl("mul", List(VariableImpl("X"), StructImpl("s", List(VariableImpl("Y"))), VariableImpl("Z"))),
-      List(FactImpl("mul", List(VariableImpl("X"), VariableImpl("Y"), VariableImpl("W"))), FactImpl("sum", List(VariableImpl("X"), VariableImpl("W"), VariableImpl("Z"))))))
-
-  val relTheorySubstituted: List[Clause] = List(RuleImpl(FactImpl("son", List(VariableImpl("X"), VariableImpl("Y"))),
-    List(FactImpl("father", List(VariableImpl("Y"), VariableImpl("X"))), FactImpl("male", List(VariableImpl("X"))))),
-    FactImpl("father", List(AtomImpl("abraham"), AtomImpl("isaac"))), FactImpl("father", List(AtomImpl("terach"), AtomImpl("abraham"))),
-    FactImpl("male", List(AtomImpl("isaac"))), FactImpl("male", List(AtomImpl("abraham"))), FactImpl("male", List(AtomImpl("terach"))))
+  private val mulTheorySubstituted = List(FactImpl("sum", List(AtomImpl(1), AtomImpl(0), AtomImpl(1))),
+    RuleImpl(FactImpl("sum", List(AtomImpl(1), StructImpl("s", List(StructImpl("s", List(VariableImpl("Y'"))))), StructImpl("s", List(VariableImpl("Y'"))))),
+      List(FactImpl("sum", List(AtomImpl(1), StructImpl("s", List(VariableImpl("Y'"))), VariableImpl("Y'"))))),
+    FactImpl("mul", List(AtomImpl(1), AtomImpl(0), AtomImpl(0))),
+    RuleImpl(FactImpl("mul", List(AtomImpl(1), StructImpl("s", List(StructImpl("s", List(VariableImpl("Y'"))))), VariableImpl("Y'"))),
+      List(FactImpl("mul", List(AtomImpl(1), StructImpl("s", List(VariableImpl("Y'"))), VariableImpl("W"))), FactImpl("sum", List(AtomImpl(1), VariableImpl("W"), VariableImpl("Y'"))))))
 
 
   "A term list" should "retrieve all the variables it contains" in {
