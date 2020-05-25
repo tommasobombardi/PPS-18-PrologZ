@@ -1,8 +1,9 @@
-package prologz.utils
+package utils
 
 import prologz.dsl.{AtomImpl, Clause, Fact, FactImpl, RuleImpl, StructImpl, VariableImpl}
 
-trait Utils {
+/** Sample prolog programs used for testing */
+trait PrologSamples {
 
   val mulTheory: List[Clause] = List(
     FactImpl("sum", List(VariableImpl("X"), AtomImpl(0), VariableImpl("X"))),

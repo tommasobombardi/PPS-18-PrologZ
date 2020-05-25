@@ -8,9 +8,9 @@ import prologz.dsl.{Predicate, Struct}
 import prologz.dsl.ClauseImplicits.{FactRich, PredicateRich}
 import prologz.dsl.TermImplicits.{FunctorRich, fromInt, fromString}
 import prologz.resolution.Validation.{InputError, validateProgram}
-import prologz.utils.Utils
+import utils.PrologSamples
 
-class ValidationSpec extends AnyFlatSpec with Matchers with Utils {
+class ValidationSpec extends AnyFlatSpec with Matchers with PrologSamples {
 
   private val mulGoalsNoErrors = List(Predicate("mul")(Struct("s")(Struct("s")(0)), Struct("s")(Struct("s")(0)), "Y"))
   private val mulTheoryNoErrors = List(Predicate("sum")("X", 0, "X"), Predicate("sum")("X", Struct("s")("Y"), Struct("s")("Z")) :- Predicate("sum")("X", "Y", "Z"),

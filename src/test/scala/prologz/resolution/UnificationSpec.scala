@@ -6,9 +6,9 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import prologz.dsl.{AtomImpl, Fact, FactImpl, Rule, StructImpl, VariableImpl}
 import prologz.resolution.Unification.RichClause
-import prologz.utils.Utils
+import utils.PrologSamples
 
-class UnificationSpec extends AnyFlatSpec with Matchers with Utils {
+class UnificationSpec extends AnyFlatSpec with Matchers with PrologSamples {
 
   private val mulTheoryFacts = mulTheory.flatMap{ case fact: Fact => fact.some; case _ => None }
   private val mulTheoryRules = mulTheory.flatMap{ case rule: Rule => rule.some; case _ => None }

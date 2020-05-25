@@ -6,9 +6,9 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import prologz.dsl.{AtomImpl, FactImpl, Rule, RuleImpl, StructImpl, Variable, VariableImpl}
 import prologz.resolution.Implicits.{RichFact, RichFactList, RichRule, RichTermList}
-import prologz.utils.Utils
+import utils.PrologSamples
 
-class ImplicitsSpec extends AnyFlatSpec with Matchers with Utils {
+class ImplicitsSpec extends AnyFlatSpec with Matchers with PrologSamples {
 
   private val variablesToRename: Set[Variable] = Set(VariableImpl("X"), VariableImpl("Y"),  VariableImpl("Z"))
   private val substitution = Substitution(VariableImpl("X") -> AtomImpl(1), VariableImpl("Y") -> StructImpl("s", List(VariableImpl("Z"))), VariableImpl("Z") -> VariableImpl("Y'"))
