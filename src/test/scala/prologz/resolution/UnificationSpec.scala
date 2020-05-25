@@ -26,13 +26,13 @@ class UnificationSpec extends AnyFlatSpec with Matchers with PrologSamples {
   private val relGoalRes = Substitution(VariableImpl("X") -> VariableImpl("X'"), VariableImpl("Y") -> VariableImpl("Y'"))
 
   "A theory fact" should "not unify with a goal having a different predicate name" in {
-    for(theory <- mulTheoryFacts; goal <- mulGoals if theory.name != goal.name) theory.unify(goal, Nil) shouldBe None
-    for(theory <- relTheoryFacts; goal <- relGoals if theory.name != goal.name) theory.unify(goal, Nil) shouldBe None
+    for(theory <- mulTheoryFacts; goal <- mulGoals if theory.name != goal.name) theory.unify(goal, Nil) shouldBe empty
+    for(theory <- relTheoryFacts; goal <- relGoals if theory.name != goal.name) theory.unify(goal, Nil) shouldBe empty
   }
 
   it should "not unify with a goal having a different arguments arity" in {
-    for(theory <- mulTheoryFacts; goal <- mulGoals if theory.args.size != goal.args.size) theory.unify(goal, Nil) shouldBe None
-    for(theory <- relTheoryFacts; goal <- relGoals if theory.args.size != goal.args.size) theory.unify(goal, Nil) shouldBe None
+    for(theory <- mulTheoryFacts; goal <- mulGoals if theory.args.size != goal.args.size) theory.unify(goal, Nil) shouldBe empty
+    for(theory <- relTheoryFacts; goal <- relGoals if theory.args.size != goal.args.size) theory.unify(goal, Nil) shouldBe empty
   }
 
   it should "unify with a goal having the same predicate name and all arguments that unify, retrieving the proper substitution" in {
@@ -41,13 +41,13 @@ class UnificationSpec extends AnyFlatSpec with Matchers with PrologSamples {
   }
 
   "A theory rule" should "not unify with a goal having a predicate name different from its head" in {
-    for(theory <- mulTheoryRules; goal <- mulGoals if theory.head.name != goal.name) theory.unify(goal, Nil) shouldBe None
-    for(theory <- relTheoryRules; goal <- relGoals if theory.head.name != goal.name) theory.unify(goal, Nil) shouldBe None
+    for(theory <- mulTheoryRules; goal <- mulGoals if theory.head.name != goal.name) theory.unify(goal, Nil) shouldBe empty
+    for(theory <- relTheoryRules; goal <- relGoals if theory.head.name != goal.name) theory.unify(goal, Nil) shouldBe empty
   }
 
   it should "not unify with a goal having an arguments arity different from its head" in {
-    for(theory <- mulTheoryRules; goal <- mulGoals if theory.head.args.size != goal.args.size) theory.unify(goal, Nil) shouldBe None
-    for(theory <- relTheoryRules; goal <- relGoals if theory.head.args.size != goal.args.size) theory.unify(goal, Nil) shouldBe None
+    for(theory <- mulTheoryRules; goal <- mulGoals if theory.head.args.size != goal.args.size) theory.unify(goal, Nil) shouldBe empty
+    for(theory <- relTheoryRules; goal <- relGoals if theory.head.args.size != goal.args.size) theory.unify(goal, Nil) shouldBe empty
   }
 
   it should "unify with a goal having the same predicate name of its head and all arguments that unify, retrieving the proper substitution" in {
