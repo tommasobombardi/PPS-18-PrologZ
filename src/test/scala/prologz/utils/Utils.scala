@@ -1,6 +1,6 @@
 package prologz.utils
 
-import prologz.dsl.{AtomImpl, Clause, Fact, FactImpl, Predicate, RuleImpl, StructImpl, VariableImpl}
+import prologz.dsl.{AtomImpl, Clause, Fact, FactImpl, RuleImpl, StructImpl, VariableImpl}
 
 trait Utils {
 
@@ -12,7 +12,8 @@ trait Utils {
     RuleImpl(FactImpl("mul", List(VariableImpl("X"), StructImpl("s", List(VariableImpl("Y"))), VariableImpl("Z"))),
       List(FactImpl("mul", List(VariableImpl("X"), VariableImpl("Y"), VariableImpl("W"))), FactImpl("sum", List(VariableImpl("X"), VariableImpl("W"), VariableImpl("Z"))))))
 
-  val mulGoals: List[Fact] = List(FactImpl("mul", List(StructImpl("s", List(StructImpl("s", List(AtomImpl(0))))), StructImpl("s", List(StructImpl("s", List(AtomImpl(0))))), VariableImpl("Y"))))
+  val mulGoals: List[Fact] = List(
+    FactImpl("mul", List(StructImpl("s", List(StructImpl("s", List(AtomImpl(0))))), StructImpl("s", List(StructImpl("s", List(AtomImpl(0))))), VariableImpl("Y"))))
 
   val relTheory: List[Clause] = List(
     RuleImpl(FactImpl("son", List(VariableImpl("X"), VariableImpl("Y"))),
@@ -23,6 +24,7 @@ trait Utils {
     FactImpl("male", List(AtomImpl("abraham"))),
     FactImpl("male", List(AtomImpl("terach"))))
 
-  val relGoals: List[Fact] = List(FactImpl("son", List(VariableImpl("X"), VariableImpl("Y"))))
+  val relGoals: List[Fact] = List(
+    FactImpl("son", List(VariableImpl("X"), VariableImpl("Y"))))
 
 }
