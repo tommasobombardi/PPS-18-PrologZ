@@ -39,7 +39,12 @@ class ClauseSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "retrieve an error list in case of errors in fact (head) or in argument list (body)" in {
-
+    Predicate("sum++")("X", Struct("S")("Y"), Struct("s")("Z2")) :- Predicate("sum")("X", "Y", "Z") should (be a Symbol("isFailure") and be (a [ValidationNel[String @@ InputError, Rule]]))
+    Predicate("sum")("X", Struct("s")("Y"), Struct("s")("Z")) :- Predicate("Sum")("X**", "Y", "1Z")should (be a Symbol("isFailure") and be (a [ValidationNel[String @@ InputError, Rule]]))
+    Predicate("sum++")("X", Struct("S")("Y"), Struct("s")("Z2"))  :- Predicate("Sum")("X**", "Y", "1Z") should (be a Symbol("isFailure") and be (a [ValidationNel[String @@ InputError, Rule]]))
+    Predicate("sum++")("X", Struct("S")("Y"), Struct("s")("Z2")).setBody(Predicate("sum")("X", "Y", "Z")) should (be a Symbol("isFailure") and be (a [ValidationNel[String @@ InputError, Rule]]))
+    Predicate("sum")("X", Struct("s")("Y"), Struct("s")("Z")).setBody(Predicate("Sum")("X**", "Y", "1Z")) should (be a Symbol("isFailure") and be (a [ValidationNel[String @@ InputError, Rule]]))
+    Predicate("sum++")("X", Struct("S")("Y"), Struct("s")("Z2")).setBody(Predicate("Sum")("X**", "Y", "1Z")) should (be a Symbol("isFailure") and be (a [ValidationNel[String @@ InputError, Rule]]))
   }
 
 }
