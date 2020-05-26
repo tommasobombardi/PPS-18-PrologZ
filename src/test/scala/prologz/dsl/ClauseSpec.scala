@@ -21,6 +21,12 @@ class ClauseSpec extends AnyFlatSpec with Matchers {
 
   }
 
-  // TO DO
+  "Applying ':-' or 'setBody' on a fact" should "create a valid rule in case of valid fact (head) and valid argument list (body)" in {
+
+  }
+
+  it should "retrieve an error list in case of errors in fact (head) or in argument list (body)" in {
+
+  }
 
 }
