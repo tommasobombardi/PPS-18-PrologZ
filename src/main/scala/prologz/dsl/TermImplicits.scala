@@ -10,7 +10,7 @@ import prologz.resolution.Validation.{InputError, PzValidation}
 /** Implicit conversions and helpers for [[prologz.dsl.Term]] instances */
 object TermImplicits {
 
-  implicit class FunctorRich(base: PzValidation[String @@ PzFunctor]) {
+  implicit class FunctorRich(base: PzValidation[String @@ Functor]) {
     /** Creates a compound term, the instance of this class is the functor
      *
      *  @param args terms, which still need to be validated

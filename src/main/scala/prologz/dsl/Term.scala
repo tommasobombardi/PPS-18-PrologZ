@@ -26,7 +26,7 @@ private[prologz] case class VariableImpl(override val name: String) extends Vari
 }
 
 /** Prolog functor */
-sealed trait PzFunctor
+sealed trait Functor
 
 /** Compound term */
 sealed trait Struct extends Term { def name: String; def args: List[Term] }
@@ -35,14 +35,14 @@ private[prologz] case class StructImpl(override val name: String, override val a
   override def toProlog: String = name + "(" + args.map(_.toProlog).mkString(",") + ")"
 }
 
-/** Factory for [[String @@ PzFunctor]] instances */
+/** Factory for [[String @@ Functor]] instances */
 object Struct {
   /** Creates a functor
    *
    *  @param name functor name
    *  @return functor if there is no error in name, errors list otherwise
    */
-  def apply(name: String): PzValidation[String @@ PzFunctor] = {
+  def apply(name: String): PzValidation[String @@ Functor] = {
     val nameVal1: PzValidation[String] =
       if(name.nonEmpty) name.successNel
       else InputError("An empty string is not valid to represent a compound term").failureNel
@@ -52,6 +52,6 @@ object Struct {
     val nameVal3: PzValidation[String] =
       if(name.nonEmpty && name.charAt(0).isLower) name.successNel
       else InputError("String '" + name + "' is not valid to represent a compound term, because it doesn't start with a lowercase letter").failureNel
-    (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => Tag[String, PzFunctor](name))
+    (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => Tag[String, Functor](name))
   }
 }
