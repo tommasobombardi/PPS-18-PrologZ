@@ -1,7 +1,8 @@
 package prologz.resolution
 
-import scalaz._
-import Scalaz._
+import scalaz.{@@, Failure, NonEmptyList, Success, Tag, ValidationNel}
+import scalaz.syntax.applicative._
+import scalaz.syntax.validation._
 import prologz.dsl.{Clause, Fact}
 
 /** Prolog input error */

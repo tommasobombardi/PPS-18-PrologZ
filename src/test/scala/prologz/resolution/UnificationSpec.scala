@@ -1,7 +1,6 @@
 package prologz.resolution
 
-import scalaz._
-import Scalaz._
+import scalaz.syntax.std.option._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import prologz.dsl.{AtomImpl, Fact, FactImpl, Rule, StructImpl, VariableImpl}

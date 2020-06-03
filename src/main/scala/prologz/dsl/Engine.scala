@@ -1,7 +1,9 @@
 package prologz.dsl
 
-import scalaz._
-import Scalaz._
+import scalaz.{@@, Failure, NonEmptyList, Success, Tag, TreeLoc}
+import scalaz.std.list._
+import scalaz.syntax.id._
+import scalaz.syntax.monoid._
 import scala.io.StdIn.readLine
 import prologz.resolution.Implicits.RichFactList
 import prologz.resolution.InputError

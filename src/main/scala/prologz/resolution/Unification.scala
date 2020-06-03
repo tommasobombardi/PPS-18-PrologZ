@@ -1,10 +1,13 @@
 package prologz.resolution
 
-import scalaz._
-import Scalaz._
+import scalaz.StateT
+import scalaz.std.list._
+import scalaz.std.option._
+import scalaz.syntax.monoid._
+import scalaz.syntax.std.option._
 import prologz.dsl.{Clause, Fact, Rule, Struct, Term, Variable}
 import prologz.resolution.Implicits.{RichFact, RichFactList, RichRule, RichTermList}
-import prologz.resolution.Substitution.{fromTuple, Substitution}
+import prologz.resolution.Substitution.{Substitution, fromTuple}
 
 /** Implicit helpers for [[Clause]] instances */
 private[prologz] object Unification {

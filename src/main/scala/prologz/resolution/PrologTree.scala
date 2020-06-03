@@ -1,7 +1,8 @@
 package prologz.resolution
 
-import scalaz._
-import Scalaz._
+import scalaz.{Show, TreeLoc}
+import scalaz.syntax.monoid._
+import scalaz.syntax.tree._
 import prologz.dsl.{Clause, Fact}
 import prologz.resolution.Implicits.RichFactList
 import prologz.resolution.Substitution.{RichSubstitution, Substitution, substitutionMonoid}

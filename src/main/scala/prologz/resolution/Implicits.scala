@@ -1,7 +1,10 @@
 package prologz.resolution
 
-import scalaz._
-import Scalaz._
+import scalaz.std.function._
+import scalaz.std.list._
+import scalaz.std.set._
+import scalaz.syntax.functor._
+import scalaz.syntax.monoid._
 import scala.language.implicitConversions
 import prologz.dsl.{Fact, FactImpl, Rule, RuleImpl, Struct, StructImpl, Term, Variable, VariableImpl}
 import prologz.resolution.Substitution.Substitution
@@ -32,7 +35,7 @@ private[prologz] object Implicits {
   implicit class RichTermList(base: List[Term]) extends RichElement[List[Term]] {
     override def getVariables: Set[Variable] = getVariablesTerms(base)
     override def rename(variables: Set[Variable]): List[Term] = renameTerms(base, variables, variables |+| base.getVariables)
-    override def substitute(subs: Substitution): List[Term] = subs.map(substituteTerms).foldLeft(identity[List[Term]](_))((acc, el) => acc >>> el)(base)
+    override def substitute(subs: Substitution): List[Term] = subs.map(substituteTerms).foldLeft(identity[List[Term]](_))((acc, el) => acc map el)(base)
   }
 
   implicit class RichFact(base: Fact) extends RichElement[Fact] {

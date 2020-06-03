@@ -1,7 +1,8 @@
 package prologz.dsl
 
-import scalaz._
-import Scalaz._
+import scalaz.{@@, Tag}
+import scalaz.syntax.applicative._
+import scalaz.syntax.validation._
 import scala.language.implicitConversions
 import prologz.resolution.InputError
 import prologz.resolution.Validation.{InputError, PzValidation}
