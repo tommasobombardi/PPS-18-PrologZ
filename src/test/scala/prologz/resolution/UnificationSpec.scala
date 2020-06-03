@@ -1,5 +1,6 @@
 package prologz.resolution
 
+import scalaz.std.option._
 import scalaz.syntax.std.option._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -9,11 +10,11 @@ import prologz.utils.PrologSamples
 
 class UnificationSpec extends AnyFlatSpec with Matchers with PrologSamples {
 
-  private val mulTheoryFacts = mulTheory.flatMap{ case fact: Fact => fact.some; case _ => None }
-  private val mulTheoryRules = mulTheory.flatMap{ case rule: Rule => rule.some; case _ => None }
+  private val mulTheoryFacts = mulTheory.flatMap{ case fact: Fact => fact.some; case _ => none[Fact] }
+  private val mulTheoryRules = mulTheory.flatMap{ case rule: Rule => rule.some; case _ => none[Rule] }
 
-  private val relTheoryFacts = relTheory.flatMap{ case fact: Fact => fact.some; case _ => None }
-  private val relTheoryRules = relTheory.flatMap{ case rule: Rule => rule.some; case _ => None }
+  private val relTheoryFacts = relTheory.flatMap{ case fact: Fact => fact.some; case _ => none[Fact] }
+  private val relTheoryRules = relTheory.flatMap{ case rule: Rule => rule.some; case _ => none[Rule] }
 
   private val otherMulGoal = FactImpl("mul", List(StructImpl("s", List(StructImpl("s", List(AtomImpl(0))))), AtomImpl(0), VariableImpl("Y")))
   private val otherMulGoalRes = Substitution(VariableImpl("X") -> StructImpl("s", List(StructImpl("s", List(AtomImpl(0))))), VariableImpl("Y") -> AtomImpl(0))
