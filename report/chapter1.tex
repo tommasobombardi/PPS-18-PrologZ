@@ -12,11 +12,15 @@ Scalaz rappresenta un progetto molto ampio, tanto che la prima release risale al
 
 \section{Sezione 1}
 
+testo
+
+\section{Type classes for functional programming}
+
 \newpage
 
-\subsection{Semigroup e Monoid}
+\subsection{Semigroup and Monoid}
 
-In matematica, un semigruppo è definito come una \textit{struttura dati algebrica costituita da un insieme di elementi munito di un'operazione binaria associativa} (funzione che associa a due elementi di un tipo un terzo elemento dello stesso tipo). Analizzando questo concetto nell'ambito della programmazione, un semigruppo può essere costituito, ad esempio, da un insieme di stringhe e dall'operazione di concatenazione oppure da un insieme di interi e da un'operazione quale addizione, moltiplicazione o elevamento a potenza.
+In matematica, un semigruppo è definito come una struttura dati algebrica costituita da un insieme di elementi munito di un'operazione binaria associativa (funzione che associa a due elementi di un tipo un terzo elemento dello stesso tipo). Analizzando questo concetto nell'ambito della programmazione, un semigruppo può essere costituito, ad esempio, da un insieme di stringhe e dall'operazione di concatenazione oppure da un insieme di interi e dall'operazione di addizione, moltiplicazione o elevamento a potenza.
 
 Scalaz mette a disposizione il trait Semigroup[S], e ogni sua implementazione (type class) rappresenta un semigruppo. Esso soddisferà due regole:
 
@@ -27,13 +31,13 @@ Scalaz mette a disposizione il trait Semigroup[S], e ogni sua implementazione (t
 
 Inoltre Scalaz definisce l'operatore \textit{mappend} e il suo alias simbolico |+| che, tramite il meccanismo di method injection (e quindi usando gli impliciti), possono essere richiamati su un oggetto per il cui tipo è stata definita un'istanza di Semigroup e restituiscono la ``combinazione'' dei due oggetti.
 
-\lstinputlisting[caption=Definizione di Semigroup e operatore mappend]{code/Semigroup.scala}
+\lstinputlisting[caption=Definizione di Semigroup e operatore \textit{mappend}]{code/Semigroup.scala}
 
 In sintesi, è possibile affermare che un Semigroup consente di definire una politica con cui combinare gli elementi di un determinato tipo. Prendiamo però un semplice esempio: data una lista di elementi di un certo tipo e un semigruppo che consente di combinarli, si vuole ottenere un singolo elemento corrispondente alla combinazione di tutti gli elementi della lista (ad esempio, partendo dal primo e arrivando all'ultimo o viceversa).
 
 Il problema dato potrebbe essere risolto semplicemente combinando progressivamente un ``accumulatore'' con i vari elementi della lista, ma da dove iniziare? Sarebbe necessario avere a disposizione l'elemento neutro dell'operazione di combinazione, che non è però definito in un Semigroup.
 
-Partendo da questo tipo di esigenza Scalaz fornisce la propria definizione di monoide, Monoid[M], ossia un \textit{semigruppo dotato di un valore che funge da identità rispetto alla funzione binaria associativa}. Questo valore è detto zero e può essere, ad esempio, una stringa vuota nel caso dell'operazione di concatenazione, 0 nel caso dell'addizione o 1 per la moltiplicazione. Tutti i monoidi devono rispettare quanto previsto per i semigruppi e due regole aggiuntive:
+Partendo da questo tipo di esigenza Scalaz fornisce la propria definizione di monoide, Monoid[M], ossia un semigruppo dotato di un valore che funge da identità rispetto alla funzione binaria associativa. Questo valore è detto zero e può essere, ad esempio, una stringa vuota nel caso della concatenazione, 0 nel caso dell'addizione o 1 per la moltiplicazione. Tutti i monoidi devono rispettare quanto previsto per i semigruppi e due regole aggiuntive:
 
 \begin{itemize}
 \item \textit{Identità sinistra}: $\forall$ a $\in$ M, append(M.zero, a) = a.
@@ -48,32 +52,32 @@ Scalaz fornisce istanze implicite predefinite di semigruppi e monoidi, ad esempi
 
 Dato un semplice valore, è banale applicare ad esso una funzione. Spesso però questo valore è racchiuso all'interno di un contesto: in questo caso, la funzione non può essere applicata direttamente, il risultato dipende dal contesto ed entrano in gioco i funtori (un'altra astrazione funzionale).
 
-Scalaz fornisce la propria definizione di funtore attraverso il trait Functor[F[$\_$]], le cui implementazioni sono type class destinate agli oggetti che possono essere mappati. Il funtore definisce un metodo map in cui viene esplicitato come, dato un valore in un contesto F[A], applicare una funzione A -> B in modo da ottenere un nuovo valore all'interno di un contesto F[B].
+Scalaz fornisce la propria definizione di funtore attraverso il trait Functor[F[$\_$]], le cui implementazioni sono type class destinate agli oggetti che possono essere mappati. Il funtore definisce un metodo \textit{map} in cui viene esplicitato come, dato un valore in un contesto F[A], applicare una funzione A -> B in modo da ottenere un nuovo valore all'interno di un contesto F[B].
 
-Questa definizione è familiare se si considera il metodo map delle collezioni, che restituisce lo stesso tipo di collezione contenente i vari elementi della collezione dopo l'applicazione della funzione data, o quello degli option, che applica la funzione data soltanto se il valore è presente.
+Questa definizione è familiare se si considera il metodo \textit{map} delle collezioni, che restituisce lo stesso tipo di collezione contenente i vari elementi della collezione dopo l'applicazione della funzione data, o quello degli option, che applica la funzione data soltanto se il valore è presente.
 
 \begin{figure}[th]
 \centering
 \includegraphics[scale=0.65]{images/functor}
 \decoRule
-\caption[functor]{Comportamento della funzione map definita da Functor[Option] \cite{FunctorsApplicativesMonads}}
+\caption[functor]{Comportamento della funzione \textit{map} definita da Functor[Option] \cite{FunctorsApplicativesMonads}}
 \end{figure}
 
-Oltre a fornire la propria definizione del concetto di funtore, per i tipi per cui è implementato un funtore Scalaz abilita alcuni operatori iniettati che rendono disponibile il metodo map  e altri in grado di modificare la struttura dati di partenza come as, fpair, fproduct, strengthL, strengthR, e void.
+Oltre a fornire la propria definizione del concetto di funtore, per i tipi per cui è implementato un funtore Scalaz abilita alcuni operatori iniettati che rendono disponibile il metodo \textit{map} e altri in grado di modificare la struttura dati di partenza come \textit{as}, \textit{fpair}, \textit{fproduct}, \textit{strengthL}, \textit{strengthR}, e \textit{void}.
 
-Un aspetto molto interessante è costituito dal fatto che Scalaz definisce un'istanza di funtore anche per le funzioni, che in questo caso sono viste come una mappa infinita dal dominio al codominio. Così, usando il metodo map, è possibile comporre due o più funzioni, anche se con un'anomalia non trascurabile: l'ordine è invertito rispetto alla classica composizione.
+Un aspetto molto interessante è costituito dal fatto che Scalaz definisce un'istanza di funtore anche per le funzioni, che in questo caso sono viste come una mappa infinita dal dominio al codominio. Così, usando il metodo \textit{map}, è possibile comporre due o più funzioni, anche se con un'anomalia non trascurabile: l'ordine è invertito rispetto alla classica composizione.
 
-Tradizionalmente, la composizione di f e g porta ad ottenere una funzione corrispondente all'esecuzione di g seguita dall'esecuzione di f. Al contrario nei Functor di Scalaz, dato che map è un metodo iniettato in F[A], la prima funzione eseguita è f e sul suo risultato viene poi applicata g.
+Tradizionalmente, la composizione di f e g porta ad ottenere una funzione corrispondente all'esecuzione di g seguita dall'esecuzione di f. Al contrario nei Functor di Scalaz, dato che \textit{map} è un metodo iniettato in F[A], la prima funzione eseguita è f e sul suo risultato viene poi applicata g.
 
 \lstinputlisting[caption=Definizione di Functor e semplici esempi d'uso]{code/Functor.scala}
 
-\subsection{Apply e Applicative}
+\subsection{Apply and Applicative}
 
 Un funtore consente di applicare una funzione ad un valore all'interno di un contesto, ma se anche la funzione fosse racchiusa in un contesto? Per consentire l'applicazione della funzione nel caso descritto Scalaz introduce Apply[F[$\_$]], un'estensione di Functor[F] che espone un metodo \textit{ap}. Si tratta di una versione potenziata di \textit{map}, poiché estrae una funzione da un contesto e successivamente applica map su un valore usando la funzione estratta. 
 
 Inoltre Scalaz abilita gli operatori iniettati <*>, alias simbolico per il metodo \textit{ap}, *> e <*, variazioni che restituiscono solo la parte destra o sinistra.
 
-Scalaz raffina ulteriormente il concetto espresso con Apply, attraverso la definizione del trait Applicative[F[$\_$]]. Gli applicativi, oltre ad essere istanze di Apply, introducono il metodo \textit{point} (e il suo alias \textit{pure}) che prende un valore di qualsiasi tipo e lo restituisce all'interno del contesto per cui è stato definito l'applicativo. Inoltre, Scalaz introduce il metodo \textit{point} per tutti i tipi di dati e consente così di trasformare un valore di tipo A in F[A].
+Scalaz raffina ulteriormente il concetto espresso con Apply, attraverso la definizione del trait Applicative[F[$\_$]]. Gli applicativi, oltre ad essere istanze di Apply, introducono il metodo \textit{point} (e il suo alias \textit{pure}) che prende un valore di qualsiasi tipo e lo restituisce all'interno del contesto per cui è stato definito l'applicativo. Inoltre, Scalaz inietta il metodo \textit{point} in tutti i tipi di dati consentendo così di trasformare un valore di tipo A in F[A].
 
 \lstinputlisting[caption=Definizione di Apply e Applicative e esempi di utilizzo dell'operatore <*>]{code/Applicative.scala}
 
@@ -81,7 +85,7 @@ Seguendo lo stile introdotto con gli applicativi, Scalaz definisce anche una nuo
 
 Per fornire lo stesso supporto anche a questi applicativi è stato introdotto \textit{Applicative Builder}, un'implementazione alternativa dello stile ispirato agli applicativi che usa la sintassi (valore1 |@| valore2 |@| ...) \{ funzione \}.
 
-\lstinputlisting[caption=Alcuni semplici esempi con Applicative Style e Applicative Builder]{code/ApplicativeStyle.scala}
+\lstinputlisting[caption=Esempi di \textit{Applicative Style} e \textit{Applicative Builder}]{code/ApplicativeStyle.scala}
 
 \subsection{Monad}
 
@@ -91,7 +95,7 @@ A differenza degli applicativi, le monadi dovranno essere in grado di estrarre i
 
 \begin{figure}[th]
 \centering
-\includegraphics[scale=0.42]{images/monad}
+\includegraphics[scale=0.48]{images/monad}
 \decoRule
 \caption[monad]{Comportamento di una monade \cite{FunctorsApplicativesMonads}}
 \end{figure}
@@ -106,20 +110,107 @@ Il trait Monad[F[\_]] mette a disposizione la definizione di monade di Scalaz, d
 
 Come per gli altri costrutti visti, Scalaz fornisce ai tipi per cui è definita una monade il metodo \textit{bind} tramite l'operatore \textit{flatmap} e il suo alias >>=.
 
-\lstinputlisting[caption=Definizione di Monad e dell'operatore flatMap]{code/Monad.scala}
+\lstinputlisting[caption=Definizione di Monad e dell'operatore \textit{flatMap}]{code/Monad.scala}
 
 Un aspetto da tenere in grande considerazione quando si parla di monadi è il fatto che questo tipo di astrazioni, abilitando l'operatore \textit{flatMap}, possano essere usate in una \textit{for comprehension}. Così facendo, sarà possibile concatenare in modo semplice e leggibile una serie di applicazioni di funzione.
 
-\lstinputlisting[caption=Semplice esempio di composizione monadica senza e con l'utilizzo della for comprehension]{code/MonadFor.scala}
+\lstinputlisting[caption=Semplice esempio di composizione monadica senza e con l'utilizzo della \textit{for comprehension}]{code/MonadFor.scala}
 
 %----------------------------------------------------------------------------------------
 %	SECTION 2
 %----------------------------------------------------------------------------------------
 
-\section{Sezione 2}
+\section{Type classes for error handling}
+
+La programmazione funzionale prevede che il flusso di esecuzione del programma sia costituito da una serie di valutazioni matematiche, e il suo punto di forza è la mancanza di side effect. In caso di fallimento nell'esecuzione di una funzione (ad esempio, il mancato soddisfacimento di una condizione), è retaggio della programmazione imperativa l'utilizzo di eccezioni.
+
+Il fatto che venga lanciata un'eccezione genera però un side effect, perché l'esecuzione del programma viene interrotta e continua in un luogo diverso rispetto a quello in cui si prevede che la funzione ritorni. Affinché sia completamente rispettato il paradigma funzionale, un linguaggio dovrebbe mettere a disposizione delle strutture dati in grado di incapsulare sia il valore atteso dalle funzioni sia un valore che rappresenta una condizione di errore.
+
+All'interno della Scala Standard Library sono disponibili alcune astrazioni di questo tipo, che Scalaz va ad arricchire fornendo la propria implementazione dei costrutti già presenti e definendo delle nuove type class.
+
+\subsection{Option}
+
+La prima type class in grado di rappresentare un fallimento nell'applicazione di una funzione è Option[A], definita nella libreria standard e ampiamente usata, che offre la possibilità di ritornare o meno il risultato di una computazione. Scalaz fornisce un'estensione della sintassi disponibile per Option[A], aggiungendo metodi di costruzione alternativi e alcuni operatori unari.
+
+In particolare, per i valori di qualsiasi tipo Scalaz fornisce il metodo \textit{some} con cui è possibile creare un option contenente quel valore. Il metodo none[A] consente invece di creare un option vuoto specificando già in fase di creazione di quale tipo sarà (per questo si differenzia da \textit{None.apply}).
+
+\lstinputlisting[caption=Metodi di costruzione introdotti da Scalaz]{code/Option.scala}
+
+Scalaz definisce inoltre alcuni operatori per le istanze di Option, tra cui:
+
+\begin{itemize}
+\item |, che costituisce un alias per il metodo \textit{getOrElse}.
+\item $\sim$, ossia un alias per il metodo \textit{getOrElse} chiamato con argomento \textit{zero}.
+\item ? a | b, statement che verifica se è presente un valore nell'Option, in tal caso restituisce a e in caso contrario b.
+\end{itemize}
+
+\subsection{Either \textbackslash/}
+
+Mentre Option[A] consente di rappresentare l'assenza o la presenza di un errore, la type class Either[A, B] è in grado di inserire valori di successo in un contesto di possibile errore e di allegare un valore in caso di fallimento, in modo da poter fornire informazioni utili sull'errore che si è verificato.
+
+Nella Scala Standard Library è definito Either[A, B], ma Scalaz fornisce la propria versione attraverso la definizione del trait \textbackslash/[A, B]. Per convenzione, la parte sinistra di \textbackslash/[A, B] viene usata per gli errori (il tipo A rappresenta un errore) e la parte destra è riservata agli esiti positivi. Le istanze di \textbackslash/[A, B] possono essere create con i metodi \textit{left} e \textit{right}, iniettati in tutti i tipi.
+
+Scalaz accompagna la definizione di \textbackslash/[A, B] con metodi quali:
+
+\begin{itemize}
+\item \textit{isRight} e \textit{isLeft}, che controllano il lato da cui si trova il valore.
+\item \textit{getOrElse} e il suo alias simbolico |, che restituiscono il valore nel lato destro o un valore di default in caso di errore.
+\item \textit{swap} e il suo alias simbolico $\sim$, che invertono lato sinistro e destro.
+\item \textit{map}, che è in grado di modificare il valore del lato destro.
+\end{itemize}
+
+Inizialmente \textbackslash/[A, B] era preferibile rispetto a Either[A, B], poiché l'implementazione di Scalaz è monadica ed espone il metodo \textit{flatMap}. Questo risulta essere molto comodo nella gestione degli errori, poiché abilita l'uso della \textit{for comprehension}. Tuttavia, nelle ultime versioni della libreria standard Either è diventata monadica ed ora la differenza è prettamente stilistica.
+
+\lstinputlisting[caption=Combinazione di \textbackslash/ con una \textit{for comprehension}: fallimento in corrispondenza del primo valore sinistro]{code/Either.scala}
+
+\subsection{Validation}
+
+Either, o \textbackslash/ nella versione implementata da Scalaz, è uno strumento molto utile perché in grado di fornire una rappresentazione del fallimento. Pensiamo però ad uno scenario molto comune, in cui si verificano diversi errori nel corso della computazione e ognuno di essi è ritenuto importante.
+
+Ad esempio, si consideri un form di registrazione in cui sono richiesti nome utente, password e conferma password. Affinché l'input dell'utente sia valido, il nome utente deve essere formato da un minimo di \textit{m} caratteri e non contenere caratteri speciali, la password deve essere composta da un minimo di \textit{n} caratteri e contenere almeno una lettera maiuscola e il campo di conferma deve essere uguale alla password. Nel caso in cui un utente commetta più errori, un buon sistema dovrebbe essere in grado di segnalarli tutti così che l'utente possa correggerli contemporaneamente.
+
+Benché diversi valori di \textbackslash/ possano essere facilmente composti con una \textit{for comprehension}, la composizione assume un comportamento \textit{first-fail} poiché in caso di fallimento il valore restituito rappresenta solo il primo errore. Quindi \textbackslash/ non è adatto all'esempio: se l'utente commettesse un errore sia nel nome utente sia nella password, il secondo non sarebbe mostrato.
+
+Partendo da questi presupposti, Scalaz introduce il trait Validation[E, A] e le sue implementazioni Success[E, A] e Failure[E, A]. Il costrutto Validation[E, A] è isomorfo a \textbackslash/[E, A] ed è infatti possibile convertirlo in esso tramite il metodo \textit{disjunction} (la conversione inversa è disponibile grazie al metodo \textit{validation}). Le istanze di Validation[E, A] possono essere create con i metodi \textit{success[E]} e \textit{failure[A]}, iniettati da Scalaz in tutti i tipi di dati.
+
+A differenza di \textbackslash/[E, A], Validation[E, A] non è una monade ma, quando per E (il tipo che rappresenta l'errore in Validation[E, A]) è definito un semigruppo, esiste un Applicative[Validation[E, A]] in grado di accumulare gli errori. La sintassi più comune usata per unire le validazioni è quella proposta dall'\textit{Applicative Builder}, che consente di specificare solo la funzione con cui combinare i valori in caso di successo. Gli eventuali errori sono invece accumulati automaticamente secondo la politica stabilita dal semigruppo.
+
+\lstinputlisting[caption=Creazione di Validation e loro composizione (possibile perché è definito un semigruppo per le stringhe)]{code/Validation.scala}
+
+\subsection{ValidationNel}
+
+Validation[E, A] consente di rappresentare nello stesso costrutto sia un possibile successo sia un insieme di fallimenti, ma se non fosse possibile combinare gli errori? O se si volesse mantenere la loro separazione? Ad esempio, dato un insieme di Validation[String, A], sarebbe possibile rappresentare gli errori come una concatenazione di stringhe, ma tutti i messaggi di errore sarebbero uniti in una stringa. Di certo, non si tratta della struttura dati ideale e sarebbe più naturale usare una collezione, come una semplice lista.
+
+In questo contesto è utile il trait NonEmptyList[A], definito in Scalaz e a cui si fa riferimento con l'abbreviazione \textit{Nel}, che costituisce un wrapper per una lista, garantisce che essa non sia vuota e fa sì che il metodo \textit{head} sia sempre disponibile. Per la creazione delle istanze di NonEmptyList Scalaz mette a disposizione il metodo \textit{wrapNel}, iniettato in tutti i tipi di dati.
+
+\lstinputlisting[caption=Definizione di NonEmptyList e costruzione usando il metodo \textit{wrapNel}]{code/NonEmptyList.scala}
+
+Utilizzare \textit{Nel} e non una semplice lista come tipo per rappresentare gli errori in una validazione fa in modo che possa essere evitato, grazie al type system, il caso intrinsecamente ambiguo di \textit{Failure(List())}. Esso potrebbe infatti rappresentare infatti sia un fallimento sia l'assenza di errori.
+
+Perciò Scalaz mette a disposizione ValidationNel[E, A], un type alias per Validation[NonEmptyList[E], A], \textit{successNel[E]} e \textit{failureNel[A]}, metodi iniettati in ogni tipo per la creazione di istanze di ValidationNel[E, A]
+
+\lstinputlisting[caption=Esempi di creazione e composizione di ValidationNel]{code/ValidationNel.scala}
 
 %----------------------------------------------------------------------------------------
 %	SECTION 3
 %----------------------------------------------------------------------------------------
 
-\section{Sezione 3}
+\section{Useful features for everyday usage}
+
+\subsection{Tagging}
+
+\subsection{Compose}
+
+\subsection{Tree and TreeLoc}
+
+%----------------------------------------------------------------------------------------
+%	SECTION 4
+%----------------------------------------------------------------------------------------
+
+\section{Monads for everyday usage}
+
+\subsection{ReaderMonad}
+
+\subsection{WriterMonad}
+
+\subsection{StateMonad}
