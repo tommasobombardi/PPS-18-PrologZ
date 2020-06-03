@@ -35,7 +35,7 @@ object TermImplicits {
       else InputError("An empty string is not valid to represent a term").failureNel
     val nameVal2: PzValidation[String] =
       if(name.toCharArray.forall(_.isLetter)) name.successNel
-      else InputError(s"String $name is not valid to represent a term, because it doesn't contain only letters").failureNel
+      else InputError(s"String '$name' is not valid to represent a term, because it doesn't contain only letters").failureNel
     (nameVal1 |@| nameVal2)((name, _) => if(name.charAt(0).isLower) AtomImpl(name) else VariableImpl(name))
   }
 

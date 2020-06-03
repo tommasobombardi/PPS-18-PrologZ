@@ -48,10 +48,10 @@ object Struct {
       else InputError("An empty string is not valid to represent a compound term").failureNel
     val nameVal2: PzValidation[String] =
       if(name.toCharArray.forall(_.isLetter)) name.successNel
-      else InputError(s"String $name is not valid to represent a compound term, because it doesn't contain only letters").failureNel
+      else InputError(s"String '$name' is not valid to represent a compound term, because it doesn't contain only letters").failureNel
     val nameVal3: PzValidation[String] =
       if(name.nonEmpty && name.charAt(0).isLower) name.successNel
-      else InputError(s"String $name is not valid to represent a compound term, because it doesn't start with a lowercase letter").failureNel
+      else InputError(s"String '$name' is not valid to represent a compound term, because it doesn't start with a lowercase letter").failureNel
     (nameVal1 |@| nameVal2 |@| nameVal3)((name, _, _) => Tag[String, Functor](name))
   }
 }
