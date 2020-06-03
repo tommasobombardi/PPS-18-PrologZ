@@ -41,7 +41,7 @@ private[prologz] object Substitution {
 
   implicit class RichSubstitution(base: Substitution) {
     def getResult: Substitution = base.filter(sub => sub._1 != sub._2)
-    def toProlog: String = "{" + base.map(s => s._1.toProlog + "/" + s._2.toProlog).mkString(",") + "}"
+    def toProlog: String = s"{${base.map(sub => s"${sub._1.toProlog}/${sub._2.toProlog}").mkString(",")}}"
   }
 
 }

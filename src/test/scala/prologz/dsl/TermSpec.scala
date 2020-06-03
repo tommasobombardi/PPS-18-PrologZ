@@ -36,13 +36,13 @@ class TermSpec extends AnyFlatSpec with Matchers {
   }
 
   "The functor factory" should "create a valid functor in case of valid functor name" in {
-    Struct("p") should (be a Symbol("isSuccess") and be (a [PzValidation[String @@ PzFunctor]]))
-    Struct("seq") should (be a Symbol("isSuccess") and be (a [PzValidation[String @@ PzFunctor]]))
+    Struct("p") should (be a Symbol("isSuccess") and be (a [PzValidation[String @@ Functor]]))
+    Struct("seq") should (be a Symbol("isSuccess") and be (a [PzValidation[String @@ Functor]]))
   }
 
   it should "retrieve an error list in case of errors in functor name" in {
-    Struct("Seq") should (be a Symbol("isFailure") and be (a [ValidationNel[String @@ InputError, String @@ PzFunctor]]))
-    Struct("p:1") should (be a Symbol("isFailure") and be (a [ValidationNel[String @@ InputError, String @@ PzFunctor]]))
+    Struct("Seq") should (be a Symbol("isFailure") and be (a [ValidationNel[String @@ InputError, String @@ Functor]]))
+    Struct("p:1") should (be a Symbol("isFailure") and be (a [ValidationNel[String @@ InputError, String @@ Functor]]))
   }
 
   "The use of a functor" should "create a valid compound term in case of valid functor and valid argument list" in {

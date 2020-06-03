@@ -48,17 +48,17 @@ object Engine {
   private def solveProgram(theory: List[PzValidation[Clause]], goals: List[PzValidation[Fact]], stepByStep: Boolean): Unit = validateProgram(theory, goals) match {
     case Failure(err: NonEmptyList[String @@ InputError]) =>
       solved += 1
-      println("[PROLOG ENGINE] Error report of program " + solved)
-      err.foreach(e => println("[PROLOG ENGINE] " + Tag.unwrap(e)))
+      println(s"[PROLOG ENGINE] Error report of program $solved")
+      err.foreach(e => println(s"[PROLOG ENGINE] ${Tag.unwrap(e)}"))
       println()
     case Success(p) =>
       solved += 1
-      println("[PROLOG ENGINE] Resolution of program " + solved)
+      println(s"[PROLOG ENGINE] Resolution of program $solved")
       val tree: TreeLoc[(List[Clause], List[Fact], Substitution)] = initializePrologTree(p._1, p._2)
         .doWhile(node => searchPrologTree(p._1, node), node => {
           if(node.getLabel._2.isEmpty) {
-            println("[PROLOG ENGINE] Available solution: " + node.getLabel._3.getResult.toProlog)
-            println("[PROLOG ENGINE] Available solution: " + p._2.substitute(node.getLabel._3.getResult).map(_.toProlog.dropRight(1)).mkString(","))
+            println(s"[PROLOG ENGINE] Available solution: ${node.getLabel._3.getResult.toProlog}")
+            println(s"[PROLOG ENGINE] Available solution: ${p._2.substitute(node.getLabel._3.getResult).map(_.toProlog.dropRight(1)).mkString(",")}")
           }
           if(node.isRoot) println("[PROLOG ENGINE] Execution completed, all alternatives have been explored")
           !node.isRoot && (!stepByStep || { println("[PROLOG ENGINE] Other alternatives can be explored. Next/Accept? (N/A)")

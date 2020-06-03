@@ -40,8 +40,7 @@ private[prologz] object PrologTree {
   }
 
   /** Policy for tree drawing */
-  implicit val showPrologTree: Show[(List[Clause], List[Fact], Substitution)] = Show.shows(el => {
-    el._2.map(_.toProlog.dropRight(1)).mkString(",") + " || " + el._3.getResult.toProlog
-  })
+  implicit val showPrologTree: Show[(List[Clause], List[Fact], Substitution)] = Show.shows(el =>
+    s"${el._2.map(_.toProlog.dropRight(1)).mkString(",")} || ${el._3.getResult.toProlog}")
 
 }
