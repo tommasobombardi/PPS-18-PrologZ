@@ -12,7 +12,17 @@ Scalaz rappresenta un progetto molto ampio, tanto che la prima release risale al
 
 \section{Sezione 1}
 
-testo
+potresti dire qualcosa del linguaggio HASKELL
+
+dovresti dire qualcosa del type system
+
+tipi di polimorfismo e quale è stato usato in scalaz
+
+introduzione di type class di base come equal e show
+
+%----------------------------------------------------------------------------------------
+%	SECTION 2
+%----------------------------------------------------------------------------------------
 
 \section{Type classes for functional programming}
 
@@ -117,7 +127,7 @@ Un aspetto da tenere in grande considerazione quando si parla di monadi è il fa
 \lstinputlisting[caption=Semplice esempio di composizione monadica senza e con l'utilizzo della \textit{for comprehension}]{code/MonadFor.scala}
 
 %----------------------------------------------------------------------------------------
-%	SECTION 2
+%	SECTION 3
 %----------------------------------------------------------------------------------------
 
 \section{Type classes for error handling}
@@ -134,7 +144,7 @@ La prima type class in grado di rappresentare un fallimento nell'applicazione di
 
 In particolare, per i valori di qualsiasi tipo Scalaz fornisce il metodo \textit{some} con cui è possibile creare un option contenente quel valore. Il metodo none[A] consente invece di creare un option vuoto specificando già in fase di creazione di quale tipo sarà (per questo si differenzia da \textit{None.apply}).
 
-\lstinputlisting[caption=Metodi di costruzione introdotti da Scalaz]{code/Option.scala}
+\lstinputlisting[caption=Metodi introdotti per la costruzione di Option]{code/Option.scala}
 
 Scalaz definisce inoltre alcuni operatori per le istanze di Option, tra cui:
 
@@ -192,25 +202,75 @@ Perciò Scalaz mette a disposizione ValidationNel[E, A], un type alias per Valid
 \lstinputlisting[caption=Esempi di creazione e composizione di ValidationNel]{code/ValidationNel.scala}
 
 %----------------------------------------------------------------------------------------
-%	SECTION 3
+%	SECTION 4
 %----------------------------------------------------------------------------------------
 
 \section{Useful features for everyday usage}
 
+In aggiunta alle type class presentate nelle sezioni precedenti, Scalaz offre molti altri costrutti che possono essere un valido supporto per la programmazione. Di seguito saranno approfonditi alcuni di essi, ritenuti significativi e rivelatisi utili nell'implementazione del caso d'uso presentato.
+
 \subsection{Tagging}
 
-\subsection{Compose}
+Il type system di Scala ha diverse potenzialità, come la possibilità di definire type alias in grado di rendere il codice più leggibile, ma non consente di limitare il range di supporto di un tipo. Si supponga ad esempio di voler esprimere una massa con il chilogrammo: si potrebbe usare un Double, ma come distinguerlo da altri Double che rappresentano concetti diversi?
+
+La soluzione più semplice, e probabilmente la più naturale, consiste nel definire una case class \textit{KiloGram} contenente un solo parametro \textit{value} corrispondente alla massa (espressa attraverso un Double). In questo modo si ottiene la sicurezza dei tipi, ma si presentano i seguenti problemi:
+
+\begin{itemize}
+\item È necessario chiamare \textit{object.value} per estrarre il valore.
+\item A runtime si verificheranno boxing e unboxing del valore, che comportano un maggiore costo di esecuzione. Sarà infatti allocato nello heap un oggetto wrapper (istanza della case class) contenente il valore, mentre sarebbe sufficiente mantenere quest'ultimo sullo stack.
+\end{itemize}
+
+Una soluzione alternativa è quella basata sui tipi taggati messi a disposizione da Scalaz. Il tagging consente di aggiungere ad un tipo dato un riferimento ad un altro tipo, andando così a definire un nuovo tipo. Inoltre, è stato introdotto l'alias di tipo @@ che, dati due tipi A e B, prevede che A with Tagged[B] possa essere rappresentato nella forma compatta A @@ B.
+
+Scalaz fornisce il metodo \textit{Tag[A, B].apply}, con cui è possibile taggare un valore di tipo A con il tipo B. Per ottenere il valore presente nel tipo taggato è invece necessaria un'operazione di cast, disponibile grazie a \textit{Tag.unwrap}.
+
+Facendo ancora riferimento alla rappresentazione del chilogrammo, sarà necessario definire un tipo \textit{KiloGram} (solitamente con un sealed trait) che sarà usato per taggare il tipo dei valori (Double). Double @@ KiloGram, che è un tipo vero e proprio e non un alias di tipo, sarà usato per rappresentare la massa. Qualora venga richiesto un valore di questo tipo, l'utente è obbligato a taggare il dato e in questo modo si ottiene la sicurezza dei tipi.
+
+\lstinputlisting[caption=Definizione e esempio di tipo taggato (la funzione KiloGram tagga un valore di un qualsiasi tipo)]{code/Tag.scala}
+
+Essendo necessario un cast esplicito per ottenere il valore presente all'interno del tipo taggato, in merito a questo aspetto non vi è un vantaggio concreto rispetto all'uso di case class (in cui è necessario chiamare \textit{object.value} per accedere al valore). Tuttavia, i tipi taggati portano i seguenti benefici:
+
+\begin{itemize}
+\item Non causano mai il boxing di un valore, perché il tipo taggato costituisce semplicemente il tipo che sarà associato al valore sullo stack.
+\item Consentono di scrivere facilmente codice generico per i tipi taggati. Per esempio, Double @@ A rappresenta tutti i Double taggati con un qualche tipo ed è possibile definire una funzione generica per essi. Questo non sarebbe possibile se i Double fossero incapsulati in delle case class.
+\end{itemize}
 
 \subsection{Tree and TreeLoc}
 
-%----------------------------------------------------------------------------------------
-%	SECTION 4
-%----------------------------------------------------------------------------------------
+Nella Scala Standard Library non è disponibile una struttura dati che consenta agli sviluppatori di rappresentare esplicitamente un albero. Benché sia semplice implementare un costrutto corrispondente a un albero, la realizzazione di algoritmi e procedure in grado di manipolarlo risulta essere decisamente complessa. Tra le varie strutture dati a complemento della libreria standard, Scalaz offre la propria implementazione di albero: Tree[A].
 
-\section{Monads for everyday usage}
+Tutte le istanze di Tree[A] sono dei multi-way tree, noti anche come rose tree, ossia strutture dati ad albero con un numero variabile e illimitato di rami per nodo. Ogni nodo dell'albero è a sua volta rappresentato come un albero (il sotto-albero radicato in quel nodo), contiene un elemento di tipo A (etichetta associata al nodo) e tutti gli alberi corrispondenti ai nodi figli.
 
-\subsection{ReaderMonad}
+Scalaz mette inoltre a disposizione i metodi \textit{leaf} e \textit{node}, iniettati in tutti i tipi di dati, che consentono di creare alberi. In particolare, il primo non accetta nessun argomento e crea un albero corrispondente ad una foglia (nodo senza figli) e il secondo costruisce un nodo avente come figli i nodi dati.
 
-\subsection{WriterMonad}
+\lstinputlisting[caption={Definizione di Tree, delle sue modalità di costruzione e semplice esempio di utilizzo}]{code/Tree.scala}
 
-\subsection{StateMonad}
+Come già sottolineato, la complessità maggiore legata alla gestione dell'albero è costituita dalla realizzazione di strumenti in grado di manipolarlo. Tree[A] rappresenta un ottimo punto di partenza, ma come è possibile navigarlo? Come inserire un nodo nell'albero? Come verificare se un nodo è la radice dell'albero? Come accedere al nodo padre di un nodo dato?
+
+Al momento Tree espone solo \textit{rootLabel} e \textit{subForest}, indubbiamente insufficienti per poter fare in modo semplice le operazioni appena elencate.
+
+In quest'ambito si colloca il concetto di \textit{zipper}, un idioma che usa l'idea di ``contesto'' per manipolare le posizioni in una struttura dati. Uno zipper consente di prendere una struttura dati e concentrarsi su una sua parte, rendendo più semplici e più efficienti le operazioni di accesso e modifica.
+
+Scalaz definisce TreeLoc[A], uno zipper per Tree[A] che rappresenta un albero e una posizione al suo interno. In particolare, nel TreeLoc sono mantenuti: il nodo attualmente selezionato, i fratelli a sinistra del nodo corrente, i fratelli a destra del nodo corrente e il contesto del suo nodo padre.
+
+Nelle istanze di Tree[A] è disponibile il metodo \textit{loc}, che consente di generare il TreeLoc[A] corrispondente all'albero corrente. Ogni istanza di TreeLoc offre sia metodi capaci di spostare il focus all'interno dell'albero (e quindi di navigarlo) sia metodi in grado di aggiornare, inserire o eliminare degli elementi. Di seguito, sono riportate le funzionalità più significative:
+
+\begin{itemize}
+\item \textit{root}, che restituisce la radice dell'albero.
+\item \textit{parent}, che ritorna il padre del nodo corrente.
+\item \textit{left} e \textit{right}, che selezionano il fratello sinistro e destro del nodo corrente.
+\item \textit{firstChild} e \textit{lastChild}, che restituiscono rispettivamente il figlio più a sinistra e quello più a destra del nodo corrente.
+\item \textit{getChild}, che ritorna il figlio n-esimo del nodo corrente.
+\item \textit{findChild}, che seleziona il primo figlio diretto del nodo corrente in grado di soddisfare il predicato dato.
+\item \textit{modifyTree}, che modifica il nodo corrente con la funzione data.
+\item \textit{modifyLabel}, che modifica l'etichetta del nodo corrente applicando la funzione specificata.
+\item \textit{insertDownLast}, che inserisce il nodo figlio come ultimo figlio del nodo corrente e assegna a quest'ultimo il focus.
+\end{itemize}
+
+\lstinputlisting[caption=Definizione di TreeLoc]{code/TreeLoc.scala}
+
+\subsection{Reader Monad}
+
+\subsection{Writer Monad}
+
+\subsection{State Monad}
