@@ -2,23 +2,62 @@
 
 \label{Chapter1} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
-Scalaz\footnote{\url{https://github.com/scalaz/scalaz}} è una libreria open source per la programmazione funzionale, che mette a disposizione un grande numero di strutture dati puramente funzionali create per integrare quelle della Scala Standard Library. In Scalaz sono presenti diversi nuovi elementi, definiti principalmente sotto forma di type class, ma anche delle estensioni per le strutture dati standard.
+Scalaz è una libreria open source per la programmazione funzionale, che mette a disposizione un grande numero di strutture dati puramente funzionali create per integrare quelle della Scala Standard Library. In Scalaz sono presenti diversi nuovi elementi, definiti principalmente sotto forma di type class, ma anche delle estensioni per le strutture dati standard.
 
 Scalaz rappresenta un progetto molto ampio, tanto che la prima release risale al 2010 e l'ultima a pochi giorni fa e che si sono sviluppati diversi progetti a partire da esso (come ad esempio Scalaz IO, poi trasformatosi nello standalone ZIO, una libreria per la programmazione asincrona e concorrente). Perciò sarà approfondita soltanto una parte delle strutture dati disponibili in Scalaz, con un duplice obiettivo: fornire una panoramica significativa della libreria ed introdurre gli elementi che saranno utilizzati per l'implementazione del caso d'uso presentato in questo elaborato.
+
+Non esiste una documentazione ufficiale in grado di illustrare in modo esaustivo i costrutti presenti in Scalaz e le motivazioni che hanno portato alla loro implementazione. Perciò lo studio svolto e riportato di seguito si basa su diverse fonti, le più importanti delle quali sono: la Scaladoc e gli esempi che accompagnano la libreria \cite{Scalaz}, i post del blog \textit{learning Scalaz} scritto da Eugene Yokota \cite{LearningScalaz} e il libro \textit{Functional Programming for Mortals with Scalaz} \cite{FpForMortalsWithScalaz}.
 
 %----------------------------------------------------------------------------------------
 %	SECTION 1
 %----------------------------------------------------------------------------------------
 
-\section{Sezione 1}
+\section{Library introduction}
 
-potresti dire qualcosa del linguaggio HASKELL
+Scalaz aggiunge alla libreria standard strutture puramente funzionali, molte delle quali introdotte dal linguaggio Haskell, e lo fa utilizzando ampiamente tecniche avanzate quali polimorfismo ad hoc e method injection.
 
-dovresti dire qualcosa del type system
+La versione di Scalaz studiata e usata in questo elaborato è la \textit{7.2.30}, disponibile sia tramite l'apposito file jar sia usando SBT e specificando nel file di build \textit{libraryDependencies += "org.scalaz" \%\% "scalaz-core" \% "7.2.30"}.
 
-tipi di polimorfismo e quale è stato usato in scalaz
+\subsection{Ad hoc polymorphism}
 
-introduzione di type class di base come equal e show
+In informatica, il termine polimorfismo viene usato per fare riferimento ad espressioni che possono rappresentare valori di diversi tipi. Si può ottenere un comportamento polimorfico in vari modi, e si parla infatti di:
+
+\begin{itemize}
+\item \textbf{Polimorfismo parametrico}
+
+Il polimorfismo parametrico permette di definire genericamente una funzione o un tipo di dati, così che i valori possano essere gestiti nello stesso modo indipendentemente dal loro tipo. Tali funzioni e tipi di dati sono detti rispettivamente funzioni generiche e tipi generici.
+
+Per esempio, la funzione che restituisce l'elemento in testa ad una lista può essere definita in modo generico e sarà utilizzata una variabile di tipo corrispondente al tipo generico di elementi contenuti nella lista.
+
+\lstinputlisting{code/Polymorphism1.scala}
+\item \textbf{Polimorfismo per inclusione}
+
+Il polimorfismo per inclusione, detto anche polimorfismo del sottotipo, è fortemente legato al concetto di ereditarietà. Si tratta di una forma di polimorfismo di tipo in cui un sottotipo è un tipo di dati correlato ad un altro tipo (il supertipo) da una nozione di sostituibilità. Ciò significa che funzioni o altri elementi del programma scritti per operare su elementi del supertipo possono farlo anche su elementi del sottotipo.
+
+Rispetto al polimorfismo parametrico, quello per inclusione consente di fornire implementazioni diverse per un tipo generico A. Il principale svantaggio è costituito dal fatto che le implementazioni devono essere fornite al momento della definizione della struttura dati, perciò non è possibile definire metodi per tipi primitivi quali Int e String.
+
+\lstinputlisting{code/Polymorphism2.scala}
+\item \textbf{Polimorfismo ad hoc}
+
+Il polimorfismo ad hoc prevede che le funzioni polimorfiche possano essere applicate ad argomenti di tipo diverso, perché ognuna di esse può indicare implementazioni distinte e potenzialmente eterogenee a seconda del tipo di argomento a cui è applicata. Perciò questo polimorfismo si definisce \textit{ad hoc} ed è in contrasto col parametrico, caratterizzato da una sola implementazione per ogni funzione polimorfica.
+
+In Scala, il polimorfismo ad hoc può essere realizzato sfruttando strumenti avanzati quali conversioni implicite o parametri impliciti.
+
+\lstinputlisting{code/Polymorphism3.scala}
+\end{itemize}
+
+Scalaz utilizza il polimorfismo ad hoc perché consente di fornire definizioni di funzioni separate per diversi tipi di A (possibilità non data dal polimorfismo parametrico), di mettere a disposizione definizioni di funzioni per dei tipi (come Int nell'esempio precedente) senza dover accedere al loro codice sorgente (potenzialità non presente nel polimorfismo per inclusione) e di abilitare o disabilitare le definizioni delle funzioni in diversi ambiti.
+
+\subsection{Method injection}
+
+Un'altra tecnica avanzata che Scalaz usa per fornire le proprie astrazioni funzionali è la cosiddetta \textit{method injection}. Facendo riferimento all'esempio riportato per il polimorfismo ad hoc, per un tipo X per cui è disponibile un'istanza di Plus[X] è possibile usare il metodo \textit{plus}. Se volessimo invece avere un metodo che può essere richiamato direttamente da un'istanza di X?
+
+Applicando il meccanismo di \textit{method injection} nel caso di Plus[X], sarebbe definito un trait PlusOp[X] che contiene un valore di tipo X ed espone il metodo \textit{plus} (o un suo alias). L'implementazione di quest'ultimo richiamerebbe il metodo \textit{plus} visto in precedenza, quello che accetta due parametri. Una semplice conversione implicita dei tipi per cui è definito Plus[X] in PlusOp[X] fornirebbe loro il metodo \textit{plus}, realizzando così l'iniezione di metodo.
+
+\subsection{Type system}
+
+qui parla della type class equal
+
 
 %----------------------------------------------------------------------------------------
 %	SECTION 2
