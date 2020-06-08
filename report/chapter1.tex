@@ -20,7 +20,7 @@ La versione di Scalaz studiata e usata in questo elaborato è la \textit{7.2.30}
 
 \subsection{Ad hoc polymorphism}
 
-In informatica, il termine polimorfismo viene usato per fare riferimento ad espressioni che possono rappresentare valori di diversi tipi. Si può ottenere un comportamento polimorfico in vari modi, e si parla infatti di:
+In informatica, il termine polimorfismo viene usato per fare riferimento ad espressioni che possono rappresentare valori di diversi tipi \cite{Polymorphism}. Si può ottenere un comportamento polimorfico in vari modi, e si parla infatti di:
 
 \begin{itemize}
 \item \textbf{Polimorfismo parametrico}
@@ -56,8 +56,13 @@ Applicando il meccanismo di \textit{method injection} nel caso di Plus[X], sareb
 
 \subsection{Type system}
 
-qui parla della type class equal
+Nei linguaggi di programmazione, il type system è un sistema logico che comprende un insieme di regole e che assegna una proprietà chiamata tipo ai vari costrutti del programma (variabili, espressioni, funzioni, ...). Il type system costituisce un metodo sintattico per verificare automaticamente l'assenza di determinati errori di comportamento in un programma.
 
+In un linguaggio tipato come Scala, questo controllo è svolto in fase di compilazione e il programma viene compilato con successo solo in assenza di errori. Il type system di Scala è uno dei più sofisticati in assoluto, ma pensiamo ad un semplice esempio: \textit{1 == ``1''}. Questa espressione restituisce \textit{false} ma, dato che confronta due valori di tipi diversi (Int e String), in un'implementazione ideale non dovrebbe poter essere compilata con successo.
+
+Scalaz fornisce supporto al type system di Scala mettendo a disposizione la type class Equal[A], un'alternativa type safe alla classica implementazione di ==. Per tutti i valori di tipi per cui è definita un'istanza di Equal, grazie alla \textit{method injection}, Scalaz fornisce gli operatori ===, =/= e assert\_===. I primi due sono versioni typesafe degli operatori == e !=, mentre il terzo è un metodo typesafe con lo stesso comportamento di \textit{assert(val1==val2)}.
+
+\lstinputlisting[caption=Definizione di Equal e esempi di utilizzo degli operatori iniettati che abilita]{code/Equal.scala}
 
 %----------------------------------------------------------------------------------------
 %	SECTION 2
@@ -65,13 +70,13 @@ qui parla della type class equal
 
 \section{Type classes for functional programming}
 
-\newpage
+Scalaz fornisce molte delle type class appartenenti alla gerarchia definita nel linguaggio Haskell. Si tratta di concetti ricorrenti nella programmazione funzionale, che non sono però rappresentati nella Scala Standard Library.
 
 \subsection{Semigroup and Monoid}
 
 In matematica, un semigruppo è definito come una struttura dati algebrica costituita da un insieme di elementi munito di un'operazione binaria associativa (funzione che associa a due elementi di un tipo un terzo elemento dello stesso tipo). Analizzando questo concetto nell'ambito della programmazione, un semigruppo può essere costituito, ad esempio, da un insieme di stringhe e dall'operazione di concatenazione oppure da un insieme di interi e dall'operazione di addizione, moltiplicazione o elevamento a potenza.
 
-Scalaz mette a disposizione il trait Semigroup[S], e ogni sua implementazione (type class) rappresenta un semigruppo. Esso soddisferà due regole:
+Scalaz offre il trait Semigroup[S], e ogni sua implementazione (type class) rappresenta un semigruppo \cite{TowardsScalaz1}. Esso soddisferà due regole:
 
 \begin{itemize}
 \item \textit{Chiusura}: $\forall$ a, b $\in$ S, append(a, b) $\in$ S. È garantita dal type system.
@@ -175,7 +180,7 @@ La programmazione funzionale prevede che il flusso di esecuzione del programma s
 
 Il fatto che venga lanciata un'eccezione genera però un side effect, perché l'esecuzione del programma viene interrotta e continua in un luogo diverso rispetto a quello in cui si prevede che la funzione ritorni. Affinché sia completamente rispettato il paradigma funzionale, un linguaggio dovrebbe mettere a disposizione delle strutture dati in grado di incapsulare sia il valore atteso dalle funzioni sia un valore che rappresenta una condizione di errore.
 
-All'interno della Scala Standard Library sono disponibili alcune astrazioni di questo tipo, che Scalaz va ad arricchire fornendo la propria implementazione dei costrutti già presenti e definendo delle nuove type class.
+Nella Scala Standard Library sono disponibili alcune astrazioni di questo tipo, che Scalaz va ad arricchire fornendo la propria implementazione dei costrutti già presenti e definendo delle nuove type class \cite{ScalazDummies}.
 
 \subsection{Option}
 
@@ -236,7 +241,7 @@ In questo contesto è utile il trait NonEmptyList[A], definito in Scalaz e a cui
 
 Utilizzare \textit{Nel} e non una semplice lista come tipo per rappresentare gli errori in una validazione fa in modo che possa essere evitato, grazie al type system, il caso intrinsecamente ambiguo di \textit{Failure(List())}. Esso potrebbe infatti rappresentare infatti sia un fallimento sia l'assenza di errori.
 
-Perciò Scalaz mette a disposizione ValidationNel[E, A], un type alias per Validation[NonEmptyList[E], A], \textit{successNel[E]} e \textit{failureNel[A]}, metodi iniettati in ogni tipo per la creazione di istanze di ValidationNel[E, A]
+Perciò Scalaz mette a disposizione ValidationNel[E, A], un type alias per Validation[NonEmptyList[E], A], \textit{successNel[E]} e \textit{failureNel[A]}, metodi iniettati in ogni tipo per la creazione di istanze di ValidationNel[E, A] \cite{ValidationNel}.
 
 \lstinputlisting[caption=Esempi di creazione e composizione di ValidationNel]{code/ValidationNel.scala}
 
@@ -259,7 +264,7 @@ La soluzione più semplice, e probabilmente la più naturale, consiste nel defin
 \item A runtime si verificheranno boxing e unboxing del valore, che comportano un maggiore costo di esecuzione. Sarà infatti allocato nello heap un oggetto wrapper (istanza della case class) contenente il valore, mentre sarebbe sufficiente mantenere quest'ultimo sullo stack.
 \end{itemize}
 
-Una soluzione alternativa è quella basata sui tipi taggati messi a disposizione da Scalaz. Il tagging consente di aggiungere ad un tipo dato un riferimento ad un altro tipo, andando così a definire un nuovo tipo. Inoltre, è stato introdotto l'alias di tipo @@ che, dati due tipi A e B, prevede che A with Tagged[B] possa essere rappresentato nella forma compatta A @@ B.
+Una soluzione alternativa è quella basata sui tipi taggati messi a disposizione da Scalaz \cite{TagTypes}. Il tagging consente di aggiungere ad un tipo dato un riferimento ad un altro tipo, andando così a definire un nuovo tipo. Inoltre, è stato introdotto l'alias di tipo @@ che, dati due tipi A e B, prevede che A with Tagged[B] possa essere rappresentato nella forma compatta A @@ B.
 
 Scalaz fornisce il metodo \textit{Tag[A, B].apply}, con cui è possibile taggare un valore di tipo A con il tipo B. Per ottenere il valore presente nel tipo taggato è invece necessaria un'operazione di cast, disponibile grazie a \textit{Tag.unwrap}.
 
@@ -308,8 +313,8 @@ Nelle istanze di Tree[A] è disponibile il metodo \textit{loc}, che consente di 
 
 \lstinputlisting[caption=Definizione di TreeLoc]{code/TreeLoc.scala}
 
-\subsection{Reader Monad}
-
-\subsection{Writer Monad}
-
 \subsection{State Monad}
+
+dovresti mettere un accenno anche al monad transformer (StateT)
+
+toadd\cite{ScalazStateMonad}
