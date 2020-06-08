@@ -56,7 +56,7 @@ Applicando il meccanismo di \textit{method injection} nel caso di Plus[X], sareb
 
 \subsection{Type system}
 
-Nei linguaggi di programmazione, il type system è un sistema logico che comprende un insieme di regole e che assegna una proprietà chiamata tipo ai vari costrutti del programma (variabili, espressioni, funzioni, ...). Il type system costituisce un metodo sintattico per verificare automaticamente l'assenza di determinati errori di comportamento in un programma.
+Il type system è un sistema logico che comprende un insieme di regole, assegna una proprietà chiamata tipo ai vari costrutti del programma (variabili, espressioni, funzioni, ...) e permette quindi di verificare automaticamente l'assenza di determinati errori di comportamento in un programma.
 
 In un linguaggio tipato come Scala, questo controllo è svolto in fase di compilazione e il programma viene compilato con successo solo in assenza di errori. Il type system di Scala è uno dei più sofisticati in assoluto, ma pensiamo ad un semplice esempio: \textit{1 == ``1''}. Questa espressione restituisce \textit{false} ma, dato che confronta due valori di tipi diversi (Int e String), in un'implementazione ideale non dovrebbe poter essere compilata con successo.
 
@@ -70,7 +70,7 @@ Scalaz fornisce supporto al type system di Scala mettendo a disposizione la type
 
 \section{Type classes for functional programming}
 
-Scalaz fornisce molte delle type class appartenenti alla gerarchia definita nel linguaggio Haskell. Si tratta di concetti ricorrenti nella programmazione funzionale, che non sono però rappresentati nella Scala Standard Library.
+Scalaz fornisce molte delle type class appartenenti alla gerarchia definita nel linguaggio Haskell. Esse rappresentano concetti ricorrenti nella programmazione funzionale, che non sono però espressi esplicitamente nella Scala Standard Library. Saranno quindi approfondite le astrazioni più diffuse.
 
 \subsection{Semigroup and Monoid}
 
