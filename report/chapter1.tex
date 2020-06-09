@@ -315,6 +315,26 @@ Nelle istanze di Tree[A] è disponibile il metodo \textit{loc}, che consente di 
 
 \subsection{State Monad}
 
-dovresti mettere un accenno anche al monad transformer (StateT)
+Oltre ad esplicitare il concetto di monade fornendo un valido supporto a chiunque ne voglia definire una, Scalaz offre delle monadi standard pensate per operare in situazioni ricorrenti, tra cui è importante ricordare:
 
-toadd\cite{ScalazStateMonad}
+\begin{itemize}
+\item \textbf{Reader Monad} Ogni azione è una funzione che ha come parametro l'ambiente. Un'azione può quindi leggere quanto contenuto nell'ambiente, ma non può modificare l'ambiente visto dalle azioni successive.
+\item \textbf{Writer Monad} Ogni azione è una funzione che restituisce un valore da scrivere. Un'azione non può vedere quali altre azioni hanno già scritto, mentre i vari output accumulati sono disponibili al chiamante.
+\item \textbf{State Monad} Ogni azione accetta un valore che rappresenta il vecchio stato e restituisce un valore dello stesso tipo corrispondente al nuovo stato. Un'azione può vedere lo stato in entrata e modificarlo prima di passarlo alla successiva. La state monad porta con sé un vincolo più stringente rispetto alle precedenti: dato che lo stato deve essere passato tra le varie computazioni, queste devono essere sequenziali.
+\end{itemize}
+
+Sia per motivi di tempo sia perché le monadi reader e writer non sono state usate nella realizzazione del caso d'uso presentato, saranno approfonditi soltanto funzionamento e implementazione della state monad \cite{ScalazStateMonad}.
+
+A differenza del concetto generale di monade, StateMonad avvolge in modo specifico le funzioni. Si tratta di funzioni particolari, che accettano uno stato e restituiscono un valore insieme ad un nuovo stato, e rappresentano quindi una computazione con stato. In Scalaz, ogni state monad è istanza di State[S, A] ed è possibile utilizzare il companion object State per inizializzarne una partendo da una funzione nella forma \textit{s -> (a, s)}.
+
+\lstinputlisting[caption=Creazione e composizione di StateMonad]{code/State.scala}
+
+Nelll'esempio precedente l'oggetto State estende il trait StateFunctions, interessante perché contiene delle funzioni di supporto per operazioni che coinvolgono lo stato. Inoltre la \textit{for comprehension} riportata fa sì che venga generata una state monad in grado di eseguire in sequenza le tre computazioni, in cui lo stato condiviso è passato da ogni computazione alla successiva.
+
+\lstinputlisting[caption=Funzioni di supporto definite in StateFunctions]{code/StateFunctions.scala}
+
+Si consideri però il caso in cui una o più computazioni espresse tramite StateMonad possano fallire: è oneroso delegare la gestione degli errori alla logica interna della monade, la soluzione ideale sarebbe quella di includere la gestione dei fallimenti all'interno della state monad. Per poterlo fare è necessario introdurre un nuovo concetto, quello di \textit{monad transformer}. Si tratta di un'entità simile ad una monade che, a differenza di essa, non è autonoma ma modifica il comportamento di una monade sottostante.
+
+Scalaz rappresenta il \textit{monad transformer} dedicato alla StateMonad con il trait StateT[F[\_], S, A]. Esso prevede che il risultato di ogni computazione sia incapsulato all'interno di un ``contenitore'' di tipo F e che da quest'ultimo dipendano le computazioni successive. Ad esempio, nel caso di State[Option, S, A] l'esecuzione di ogni computazione deve restituire Option[(S, A)] e, se dovesse verificarsi un fallimento, questo sarebbe propagato anche alle computazioni successive. In Scalaz State[S, A] è semplicemente un type alias che corrisponde a StateT[Id, S, A], dove Id corrisponde alla monade identità, poiché applica semplicemente la funzione incapsulata nella monade.
+
+\lstinputlisting[caption=Definizione del \textit{monad transformer} StateT]{code/StateT.scala}
