@@ -1,12 +1,11 @@
 package prologz.resolution
 
-import scalaz.syntax.nel._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import prologz.dsl.{Predicate, Struct}
 import prologz.dsl.ClauseImplicits.{FactRich, PredicateRich}
 import prologz.dsl.TermImplicits.{FunctorRich, fromInt, fromString}
-import prologz.resolution.Validation.{InputError, validateProgram}
+import prologz.resolution.Validation.validateProgram
 import prologz.utils.PrologSamples
 
 class ValidationSpec extends AnyFlatSpec with Matchers with PrologSamples {
@@ -33,18 +32,18 @@ class ValidationSpec extends AnyFlatSpec with Matchers with PrologSamples {
   }
 
   it should "detect if there are errors only in program theory and report them" in {
-    validateProgram(mulTheoryWithErrors, mulGoalsNoErrors).swap.getOrElse(InputError("").wrapNel) should have size 7 // 7 (7 + 0)
-    validateProgram(relTheoryWithErrors, relGoalsNoErrors).swap.getOrElse(InputError("").wrapNel) should have size 3 // 3 (3 + 0)
+    validateProgram(mulTheoryWithErrors, mulGoalsNoErrors).swap.map(err => err.head :: err.tail.toList).getOrElse(Nil) should have size 7 // 7 (7 + 0)
+    validateProgram(relTheoryWithErrors, relGoalsNoErrors).swap.map(err => err.head :: err.tail.toList).getOrElse(Nil) should have size 3 // 3 (3 + 0)
   }
 
   it should "detect if there are errors only in program goals and report them" in {
-    validateProgram(mulTheoryNoErrors, mulGoalsWithErrors).swap.getOrElse(InputError("").wrapNel) should have size 4 // 4 (0 + 4)
-    validateProgram(relTheoryNoErrors, relGoalsWithErrors).swap.getOrElse(InputError("").wrapNel) should have size 2 // 2 (0 + 2)
+    validateProgram(mulTheoryNoErrors, mulGoalsWithErrors).swap.map(err => err.head :: err.tail.toList).getOrElse(Nil) should have size 4 // 4 (0 + 4)
+    validateProgram(relTheoryNoErrors, relGoalsWithErrors).swap.map(err => err.head :: err.tail.toList).getOrElse(Nil) should have size 2 // 2 (0 + 2)
   }
 
   it should "detect if there are errors both in program theory and goals and report them" in {
-    validateProgram(mulTheoryWithErrors, mulGoalsWithErrors).swap.getOrElse(InputError("").wrapNel) should have size 11 // 11 (7 + 4)
-    validateProgram(relTheoryWithErrors, relGoalsWithErrors).swap.getOrElse(InputError("").wrapNel) should have size 5 // 5 (3 + 2)
+    validateProgram(mulTheoryWithErrors, mulGoalsWithErrors).swap.map(err => err.head :: err.tail.toList).getOrElse(Nil) should have size 11 // 11 (7 + 4)
+    validateProgram(relTheoryWithErrors, relGoalsWithErrors).swap.map(err => err.head :: err.tail.toList).getOrElse(Nil) should have size 5 // 5 (3 + 2)
   }
 
 }
