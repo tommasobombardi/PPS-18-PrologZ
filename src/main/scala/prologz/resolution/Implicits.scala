@@ -6,10 +6,10 @@ import scalaz.std.set._
 import scalaz.syntax.functor._
 import scalaz.syntax.monoid._
 import scala.language.implicitConversions
-import prologz.dsl.{Fact, FactImpl, Rule, RuleImpl, Struct, StructImpl, Term, Variable, VariableImpl}
+import prologz.dsl.{Fact, Rule, Struct, Term, Variable}
 import prologz.resolution.Substitution.Substitution
 
-/** Implicit helpers for [[prologz.dsl.Clause]] and [[prologz.dsl.Clause]] instances */
+/** Implicit helpers for [[prologz.dsl.Term]] and [[prologz.dsl.Clause]] instances */
 private[prologz] object Implicits {
 
   trait RichElement[A] {
@@ -40,8 +40,8 @@ private[prologz] object Implicits {
 
   implicit class RichFact(base: Fact) extends RichElement[Fact] {
     override def getVariables: Set[Variable] = base.args.getVariables
-    override def rename(variables: Set[Variable]): Fact = FactImpl(base.name, base.args.rename(variables))
-    override def substitute(subs: Substitution): Fact = FactImpl(base.name, base.args.substitute(subs))
+    override def rename(variables: Set[Variable]): Fact = Fact(base.name, base.args.rename(variables))
+    override def substitute(subs: Substitution): Fact = Fact(base.name, base.args.substitute(subs))
   }
 
   implicit class RichFactList(base: List[Fact]) extends RichElement[List[Fact]] {
@@ -52,8 +52,8 @@ private[prologz] object Implicits {
 
   implicit class RichRule(base: Rule) extends RichElement[Rule] {
     override def getVariables: Set[Variable] = base.head.getVariables |+| base.body.getVariables
-    override def rename(variables: Set[Variable]): Rule = RuleImpl(base.head.rename(variables), base.body.rename(variables))
-    override def substitute(subs: Substitution): Rule = RuleImpl(base.head.substitute(subs), base.body.substitute(subs))
+    override def rename(variables: Set[Variable]): Rule = Rule(base.head.rename(variables), base.body.rename(variables))
+    override def substitute(subs: Substitution): Rule = Rule(base.head.substitute(subs), base.body.substitute(subs))
   }
 
   /** Retrieves variables
@@ -79,9 +79,9 @@ private[prologz] object Implicits {
    *  @return terms after renaming variables
    */
   private def renameTerms(terms: List[Term], variables: Set[Variable], notValidVars: Set[Variable], attempt: Int = 1): List[Term] = terms match {
-    case (v: Variable) :: _ if variables.contains(v) && notValidVars.contains(VariableImpl(v.name + ("'" * attempt))) => renameTerms(terms, variables, notValidVars, attempt + 1)
-    case (v: Variable) :: other if variables.contains(v) => VariableImpl(v.name + ("'" * attempt)) :: renameTerms(other, variables, notValidVars)
-    case (s: Struct) :: other => StructImpl(s.name, renameTerms(s.args, variables, variables |+| s.args.getVariables)) :: renameTerms(other, variables, notValidVars)
+    case (v: Variable) :: _ if variables.contains(v) && notValidVars.contains(Variable(v.name + ("'" * attempt))) => renameTerms(terms, variables, notValidVars, attempt + 1)
+    case (v: Variable) :: other if variables.contains(v) => Variable(v.name + ("'" * attempt)) :: renameTerms(other, variables, notValidVars)
+    case (s: Struct) :: other => Struct(s.name, renameTerms(s.args, variables, variables |+| s.args.getVariables)) :: renameTerms(other, variables, notValidVars)
     case term :: other => term :: renameTerms(other, variables, notValidVars)
     case _ => Nil
   }
@@ -94,7 +94,7 @@ private[prologz] object Implicits {
    */
   private def substituteTerms(sub: (Variable, Term))(terms: List[Term]): List[Term] = terms match {
     case (v: Variable) :: other if v == sub._1 => sub._2 :: substituteTerms(sub)(other)
-    case (s: Struct) :: other => StructImpl(s.name, substituteTerms(sub)(s.args)) :: substituteTerms(sub)(other)
+    case (s: Struct) :: other => Struct(s.name, substituteTerms(sub)(s.args)) :: substituteTerms(sub)(other)
     case term :: other => term :: substituteTerms(sub)(other)
     case _ => Nil
   }

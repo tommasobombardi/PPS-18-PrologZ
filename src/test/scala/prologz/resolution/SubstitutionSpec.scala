@@ -3,28 +3,28 @@ package prologz.resolution
 import scalaz.syntax.monoid._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import prologz.dsl.{AtomImpl, StructImpl, VariableImpl}
+import prologz.dsl.{Atom, Struct, Variable}
 import prologz.resolution.Substitution.{RichSubstitution, Substitution, substitutionMonoid}
 
 class SubstitutionSpec extends AnyFlatSpec with Matchers {
 
-  private val substitution1: Substitution = Map(VariableImpl("X") -> VariableImpl("X"), VariableImpl("Y") -> VariableImpl("Y"), VariableImpl("Z") -> VariableImpl("Z"))
-  private val substitution2: Substitution = Map(VariableImpl("X") -> AtomImpl(1), VariableImpl("Y") -> StructImpl("s", List(VariableImpl("Z"))), VariableImpl("Z") -> VariableImpl("Y'"))
-  private val substitution3: Substitution = Map(VariableImpl("Y'") -> AtomImpl(3), VariableImpl("Z") -> VariableImpl("X"))
+  private val substitution1: Substitution = Map(Variable("X") -> Variable("X"), Variable("Y") -> Variable("Y"), Variable("Z") -> Variable("Z"))
+  private val substitution2: Substitution = Map(Variable("X") -> Atom(1), Variable("Y") -> Struct("s", List(Variable("Z"))), Variable("Z") -> Variable("Y'"))
+  private val substitution3: Substitution = Map(Variable("Y'") -> Atom(3), Variable("Z") -> Variable("X"))
 
-  private val expected123 = Substitution(VariableImpl("X") -> AtomImpl(1), VariableImpl("Y") -> StructImpl("s", List(AtomImpl(3))), VariableImpl("Z") -> AtomImpl(3))
-  private val expected132 = Substitution(VariableImpl("X") -> AtomImpl(1), VariableImpl("Y") -> StructImpl("s", List(VariableImpl("Y'"))), VariableImpl("Z") -> AtomImpl(1))
-  private val expected312 = Substitution(VariableImpl("Y'") -> AtomImpl(3), VariableImpl("Z") -> AtomImpl(1))
-  private val expected321 = Substitution(VariableImpl("Y'") -> AtomImpl(3), VariableImpl("Z") -> AtomImpl(1))
+  private val expected123 = Substitution(Variable("X") -> Atom(1), Variable("Y") -> Struct("s", List(Atom(3))), Variable("Z") -> Atom(3))
+  private val expected132 = Substitution(Variable("X") -> Atom(1), Variable("Y") -> Struct("s", List(Variable("Y'"))), Variable("Z") -> Atom(1))
+  private val expected312 = Substitution(Variable("Y'") -> Atom(3), Variable("Z") -> Atom(1))
+  private val expected321 = Substitution(Variable("Y'") -> Atom(3), Variable("Z") -> Atom(1))
 
   "The substitution factory" should "create a valid substitution starting from tuples containing a variable and a term" in {
-    Substitution((VariableImpl("X"), VariableImpl("X")), (VariableImpl("Y"), VariableImpl("Y")), (VariableImpl("Z"), VariableImpl("Z"))) shouldBe substitution1
-    Substitution((VariableImpl("X"), AtomImpl(1)), (VariableImpl("Y"), StructImpl("s", List(VariableImpl("Z")))), (VariableImpl("Z"), VariableImpl("Y'"))) shouldBe substitution2
-    Substitution((VariableImpl("Y'"), AtomImpl(3)), (VariableImpl("Z"), VariableImpl("X"))) shouldBe substitution3
+    Substitution((Variable("X"), Variable("X")), (Variable("Y"), Variable("Y")), (Variable("Z"), Variable("Z"))) shouldBe substitution1
+    Substitution((Variable("X"), Atom(1)), (Variable("Y"), Struct("s", List(Variable("Z")))), (Variable("Z"), Variable("Y'"))) shouldBe substitution2
+    Substitution((Variable("Y'"), Atom(3)), (Variable("Z"), Variable("X"))) shouldBe substitution3
   }
 
   it should "create a valid identity substitution starting from a set of variables" in {
-    Substitution.base(Set(VariableImpl("X"), VariableImpl("Y"), VariableImpl("Z"))) shouldBe substitution1
+    Substitution.base(Set(Variable("X"), Variable("Y"), Variable("Z"))) shouldBe substitution1
   }
 
   "A valid substitution" should "be appended to other valid substitutions generating the proper composition" in {

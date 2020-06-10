@@ -4,7 +4,7 @@ import scalaz.std.option._
 import scalaz.syntax.std.option._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import prologz.dsl.{AtomImpl, Fact, FactImpl, Rule, StructImpl, VariableImpl}
+import prologz.dsl.{Atom, Fact, Rule, Struct, Variable}
 import prologz.resolution.Unification.RichClause
 import prologz.utils.PrologSamples
 
@@ -16,14 +16,14 @@ class UnificationSpec extends AnyFlatSpec with Matchers with PrologSamples {
   private val relTheoryFacts = relTheory.flatMap{ case fact: Fact => fact.some; case _ => none[Fact] }
   private val relTheoryRules = relTheory.flatMap{ case rule: Rule => rule.some; case _ => none[Rule] }
 
-  private val otherMulGoal = FactImpl("mul", List(StructImpl("s", List(StructImpl("s", List(AtomImpl(0))))), AtomImpl(0), VariableImpl("Y")))
-  private val otherMulGoalRes = Substitution(VariableImpl("X") -> StructImpl("s", List(StructImpl("s", List(AtomImpl(0))))), VariableImpl("Y") -> AtomImpl(0))
-  private val mulGoalRes = Substitution(VariableImpl("X") -> StructImpl("s", List(StructImpl("s", List(AtomImpl(0))))),
-    VariableImpl("Y'") -> StructImpl("s", List(AtomImpl(0))), VariableImpl("Y") -> VariableImpl("Z"))
+  private val otherMulGoal = Fact("mul", List(Struct("s", List(Struct("s", List(Atom(0))))), Atom(0), Variable("Y")))
+  private val otherMulGoalRes = Substitution(Variable("X") -> Struct("s", List(Struct("s", List(Atom(0))))), Variable("Y") -> Atom(0))
+  private val mulGoalRes = Substitution(Variable("X") -> Struct("s", List(Struct("s", List(Atom(0))))),
+    Variable("Y'") -> Struct("s", List(Atom(0))), Variable("Y") -> Variable("Z"))
 
-  private val otherRelGoal = FactImpl("father", List(VariableImpl("X"), VariableImpl("Y")))
-  private val otherRelGoalRes = Substitution(VariableImpl("X") -> AtomImpl("abraham"), VariableImpl("Y") -> AtomImpl("isaac"))
-  private val relGoalRes = Substitution(VariableImpl("X") -> VariableImpl("X'"), VariableImpl("Y") -> VariableImpl("Y'"))
+  private val otherRelGoal = Fact("father", List(Variable("X"), Variable("Y")))
+  private val otherRelGoalRes = Substitution(Variable("X") -> Atom("abraham"), Variable("Y") -> Atom("isaac"))
+  private val relGoalRes = Substitution(Variable("X") -> Variable("X'"), Variable("Y") -> Variable("Y'"))
 
   "A theory fact" should "not unify with a goal having a different predicate name" in {
     for(theory <- mulTheoryFacts; goal <- mulGoals if theory.name != goal.name) theory.unify(goal, Nil) shouldBe empty

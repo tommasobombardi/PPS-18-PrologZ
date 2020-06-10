@@ -19,7 +19,7 @@ object ClauseImplicits {
     def apply(args: PzValidation[Term]*): PzValidation[Fact] = {
       val argsVal: PzValidation[List[Term]] =
         args.foldLeft(List.empty[Term].successNel[String @@ InputError])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
-      (base |@| argsVal)((predicate, args) => FactImpl(Tag.unwrap(predicate), args))
+      (base |@| argsVal)((predicate, args) => Fact(Tag.unwrap(predicate), args))
     }
   }
 
@@ -34,12 +34,8 @@ object ClauseImplicits {
       val factsVal: PzValidation[List[Fact]] =
         if(facts.nonEmpty) facts.foldLeft(List.empty[Fact].successNel[String @@ InputError])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
         else InputError("Body (namely the list of facts) of a rule must be not empty").failureNel
-      (base |@| factsVal)((head, body) => RuleImpl(head, body))
+      (base |@| factsVal)((head, body) => Rule(head, body))
     }
   }
-
-  implicit def fromFact(fact: PzValidation[Fact]): PzValidation[Clause] = fact.asInstanceOf[PzValidation[Clause]]
-
-  implicit def fromRule(rule: PzValidation[Rule]): PzValidation[Clause] = rule.asInstanceOf[PzValidation[Clause]]
 
 }

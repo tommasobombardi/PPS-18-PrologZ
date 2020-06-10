@@ -9,7 +9,7 @@ import prologz.dsl.{Clause, Fact, Rule, Struct, Term, Variable}
 import prologz.resolution.Implicits.{RichFact, RichFactList, RichRule, RichTermList}
 import prologz.resolution.Substitution.{Substitution, fromTuple}
 
-/** Implicit helpers for [[Clause]] instances */
+/** Implicit helpers for [[prologz.dsl.Clause]] instances */
 private[prologz] object Unification {
 
   implicit class RichClause(base: Clause) {
