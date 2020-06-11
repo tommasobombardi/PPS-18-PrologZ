@@ -2,6 +2,8 @@ package prologz.dsl
 
 import scalaz.{@@, Failure, NonEmptyList, Success, Tag, TreeLoc}
 import scalaz.std.list._
+import scalaz.std.string._
+import scalaz.syntax.equal._
 import scalaz.syntax.id._
 import scalaz.syntax.monoid._
 import scala.io.StdIn.readLine
@@ -62,7 +64,7 @@ object Engine {
           }
           if(node.isRoot) println("[PROLOG ENGINE] Execution completed, all alternatives have been explored")
           !node.isRoot && (!stepByStep || { println("[PROLOG ENGINE] Other alternatives can be explored. Next/Accept? (N/A)")
-            val in = readLine.toLowerCase; in == "n" || in == "next" })
+            val in = readLine.toLowerCase; in === "n" || in === "next" })
         })
       if(printTree) { println("[PROLOG ENGINE] Prolog tree created during resolution"); println(tree.toTree.drawTree) }
       println()

@@ -1,11 +1,15 @@
 package prologz.resolution
 
 import scalaz.StateT
+import scalaz.std.anyVal._
 import scalaz.std.list._
 import scalaz.std.option._
+import scalaz.std.string._
+import scalaz.syntax.equal._
 import scalaz.syntax.monoid._
 import scalaz.syntax.std.option._
 import prologz.dsl.{Clause, Fact, Rule, Struct, Term, Variable}
+import prologz.dsl.TermImplicits.TermEqual
 import prologz.resolution.Implicits.{RichFact, RichFactList, RichRule, RichTermList}
 import prologz.resolution.Substitution.{Substitution, fromTuple}
 
@@ -53,10 +57,10 @@ private[prologz] object Unification {
    */
   @scala.annotation.tailrec
   private def unifyTerms(factTerms: List[Term], goalTerms: List[Term], subs: Substitution = Substitution()) : Option[Substitution] = (factTerms, goalTerms) match {
-    case (f :: ft, g :: gt) if f == g => unifyTerms(ft, gt, subs)
+    case (f :: ft, g :: gt) if f === g => unifyTerms(ft, gt, subs)
     case ((v: Variable) :: _, (s: Struct) :: _) if s.args.getVariables.contains(v) => none[Substitution] // avoid endless loop (e.g. X can't be assigned to s(X))
     case ((s: Struct) :: _, (v: Variable) :: _) if s.args.getVariables.contains(v) => none[Substitution] // avoid endless loop (e.g. X can't be assigned to s(X))
-    case ((s1: Struct) :: ft, (s2: Struct) :: gt) if s1.name == s2.name && s1.args.size == s2.args.size => unifyTerms(s1.args |+| ft, s2.args |+| gt, subs)
+    case ((s1: Struct) :: ft, (s2: Struct) :: gt) if s1.name === s2.name && s1.args.size === s2.args.size => unifyTerms(s1.args |+| ft, s2.args |+| gt, subs)
     case ((v1: Variable) :: ft, (v2: Variable) :: gt) => unifyTerms(ft.substitute(v2, v1), gt.substitute(v2, v1), subs + ((v2, v1)) )
     case ((v: Variable) :: ft, (t: Term) :: gt) => unifyTerms(ft.substitute(v, t), gt.substitute(v, t), subs + ((v, t)))
     case ((t: Term) :: ft, (v: Variable) :: gt) => unifyTerms(ft.substitute(v, t), gt.substitute(v, t), subs + ((v, t)))

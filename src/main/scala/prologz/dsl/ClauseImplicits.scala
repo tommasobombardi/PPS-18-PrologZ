@@ -14,7 +14,7 @@ object ClauseImplicits {
     /** Creates a fact, the instance of this class is the predicate
      *
      *  @param args terms, which still need to be validated
-     *  @return the fact if there is no error in predicate or args, errors list otherwise
+     *  @return the fact if there is no error in predicate or terms, errors list otherwise
      */
     def apply(args: PzValidation[Term]*): PzValidation[Fact] = {
       val argsVal: PzValidation[List[Term]] =

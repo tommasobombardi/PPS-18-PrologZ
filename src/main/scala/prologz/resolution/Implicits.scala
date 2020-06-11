@@ -3,6 +3,8 @@ package prologz.resolution
 import scalaz.std.function._
 import scalaz.std.list._
 import scalaz.std.set._
+import scalaz.std.string._
+import scalaz.syntax.equal._
 import scalaz.syntax.functor._
 import scalaz.syntax.monoid._
 import scala.language.implicitConversions
@@ -93,7 +95,7 @@ private[prologz] object Implicits {
    *  @return terms after applying the single substitution
    */
   private def substituteTerms(sub: (Variable, Term))(terms: List[Term]): List[Term] = terms match {
-    case (v: Variable) :: other if v == sub._1 => sub._2 :: substituteTerms(sub)(other)
+    case (v: Variable) :: other if v.name === sub._1.name => sub._2 :: substituteTerms(sub)(other)
     case (s: Struct) :: other => Struct(s.name, substituteTerms(sub)(s.args)) :: substituteTerms(sub)(other)
     case term :: other => term :: substituteTerms(sub)(other)
     case _ => Nil

@@ -1,6 +1,6 @@
 package prologz.dsl
 
-import scalaz.{@@, Tag}
+import scalaz.{@@, Equal, Tag}
 import scalaz.syntax.applicative._
 import scalaz.syntax.validation._
 import scala.language.implicitConversions
@@ -50,5 +50,9 @@ object TermImplicits {
    *  @return value converted into a term
    */
   implicit def fromDouble(value: Double): PzValidation[Atom[Double]] = Atom(value).successNel
+
+  private[prologz] implicit object TermEqual extends Equal[Term] {
+    override def equal(a1: Term, a2: Term): Boolean = a1 == a2
+  }
 
 }
