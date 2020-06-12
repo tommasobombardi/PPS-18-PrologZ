@@ -30,7 +30,7 @@ private[prologz] object Unification {
   }
 
   private def unifyFact(fact: Fact, goal: Fact, otherGoals: List[Fact]) : Option[(Substitution, List[Fact])] = {
-    if(fact.name != goal.name || fact.args.size != goal.args.size) none[(Substitution, List[Fact])] else
+    if(fact.name =/= goal.name || fact.args.size =/= goal.args.size) none[(Substitution, List[Fact])] else
       ((fact: Fact) => for {
         renamedFact <- StateT[Option, List[Fact], Fact](goals => (goals, fact.rename(goals.getVariables)).some)
         subs <- StateT[Option, List[Fact], Substitution](goals => unifyTerms(renamedFact.args, goals.head.args).map((goals.tail, _)))
@@ -39,7 +39,7 @@ private[prologz] object Unification {
   }
 
   private def unifyRule(rule: Rule, goal: Fact, otherGoals: List[Fact]) : Option[(Substitution, List[Fact])] = {
-    if(rule.head.name != goal.name || rule.head.args.size != goal.args.size) none[(Substitution, List[Fact])] else
+    if(rule.head.name =/= goal.name || rule.head.args.size =/= goal.args.size) none[(Substitution, List[Fact])] else
       ((rule: Rule) => for {
         renamedRule <- StateT[Option, List[Fact], Rule](goals => (goals, rule.rename(goals.getVariables)).some)
         subs <- StateT[Option, List[Fact], Substitution](goals => unifyTerms(renamedRule.head.args, goals.head.args).map((goals.tail, _)))

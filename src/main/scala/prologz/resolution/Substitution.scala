@@ -1,8 +1,10 @@
 package prologz.resolution
 
 import scalaz.Monoid
+import scalaz.syntax.equal._
 import scala.language.implicitConversions
 import prologz.dsl.{Term, Variable}
+import prologz.dsl.TermImplicits.TermEqual
 import prologz.resolution.Implicits.RichTermList
 
 /** Factory for [[Substitution]] instances
@@ -40,7 +42,7 @@ private[prologz] object Substitution {
   }
 
   implicit class RichSubstitution(base: Substitution) {
-    def getResult: Substitution = base.filter(sub => sub._1 != sub._2)
+    def getResult: Substitution = base.filter(sub => sub._2 =/= sub._1)
     def toProlog: String = s"{${base.map(sub => s"${sub._1.toProlog}/${sub._2.toProlog}").mkString(",")}}"
   }
 
