@@ -23,7 +23,7 @@ object Graph extends App {
 
   Engine.setPrintTree(true)
 
-  Engine.solveAll(reachable(2, 5))
+  Engine.solveAll(reachable(1, 4))
   Engine.solveAll(reachable(3, "X"))
   Engine.solve(reachable(6, "X"))
 
