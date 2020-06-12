@@ -5,7 +5,7 @@ import scalaz.syntax.monoid._
 import scalaz.syntax.tree._
 import prologz.dsl.{Clause, Fact}
 import prologz.resolution.Implicits.RichFactList
-import prologz.resolution.Substitution.{RichSubstitution, Substitution, substitutionMonoid}
+import prologz.resolution.Substitution.{RichSubstitution, Substitution, SubstitutionMonoid}
 import prologz.resolution.Unification.RichClause
 
 /** Helpers for prolog tree construction */

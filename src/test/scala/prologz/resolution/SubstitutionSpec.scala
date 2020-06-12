@@ -4,7 +4,7 @@ import scalaz.syntax.monoid._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import prologz.dsl.{Atom, Struct, Variable}
-import prologz.resolution.Substitution.{RichSubstitution, Substitution, substitutionMonoid}
+import prologz.resolution.Substitution.{RichSubstitution, Substitution, SubstitutionMonoid}
 
 class SubstitutionSpec extends AnyFlatSpec with Matchers {
 
