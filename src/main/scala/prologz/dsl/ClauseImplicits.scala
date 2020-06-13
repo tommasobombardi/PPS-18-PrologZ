@@ -32,8 +32,8 @@ object ClauseImplicits {
     def :-(facts: PzValidation[Fact]*): PzValidation[Rule] = setBody(facts:_*)
     def setBody(facts: PzValidation[Fact]*): PzValidation[Rule] = {
       val factsVal: PzValidation[List[Fact]] =
-        if(facts.nonEmpty) facts.foldLeft(List.empty[Fact].successNel[String @@ InputError])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
-        else InputError("Body (namely the list of facts) of a rule must be not empty").failureNel
+        if(facts.isEmpty) InputError("Body (namely the list of facts) of a rule must be not empty").failureNel
+        else facts.foldLeft(List.empty[Fact].successNel[String @@ InputError])((accumulator, element) => (accumulator |@| element)((acc, el) => acc :+ el))
       (base |@| factsVal)((head, body) => Rule(head, body))
     }
   }
