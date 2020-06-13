@@ -13,20 +13,19 @@ class ImplicitsSpec extends AnyFlatSpec with Matchers with PrologSamples {
   private val variablesToRename: Set[Variable] = Set(Variable("X"), Variable("Y"),  Variable("Z"))
   private val substitution = Substitution(Variable("X") -> Atom(1), Variable("Y") -> Struct("s", List(Variable("Z"))), Variable("Z") -> Variable("Y'"))
 
-  private val relRuleHeadVariables = Set(Variable("X"), Variable("Y"))
-  private val relRuleBodyVariables = Set(Variable("Y"), Variable("X"))
   private val mulRuleHeadVariables = Set(Variable("X"), Variable("Y"), Variable("Z"))
   private val mulRuleBodyVariables = Set(Variable("X"), Variable("Y"), Variable("W"), Variable("Z"))
-
-  private val relRuleRenamed = Rule(Fact("son", List(Variable("X'"), Variable("Y'"))),
-    List(Fact("father", List(Variable("Y'"), Variable("X'"))), Fact("male", List(Variable("X'")))))
   private val mulRuleRenamed = Rule(Fact("mul", List(Variable("X'"), Struct("s", List(Variable("Y'"))), Variable("Z'"))),
     List(Fact("mul", List(Variable("X'"), Variable("Y'"), Variable("W"))), Fact("sum", List(Variable("X'"), Variable("W"), Variable("Z'")))))
-
-  private val relRuleSubstituted = Rule(Fact("son", List(Atom(1), Struct("s", List(Variable("Y'"))))),
-    List(Fact("father", List(Struct("s", List(Variable("Y'"))), Atom(1))), Fact("male", List(Atom(1)))))
   private val mulRuleSubstituted = Rule(Fact("mul", List(Atom(1), Struct("s", List(Struct("s", List(Variable("Y'"))))), Variable("Y'"))),
     List(Fact("mul", List(Atom(1), Struct("s", List(Variable("Y'"))), Variable("W"))), Fact("sum", List(Atom(1), Variable("W"), Variable("Y'")))))
+
+  private val relRuleHeadVariables = Set(Variable("X"), Variable("Y"))
+  private val relRuleBodyVariables = Set(Variable("Y"), Variable("X"))
+  private val relRuleRenamed = Rule(Fact("son", List(Variable("X'"), Variable("Y'"))),
+    List(Fact("father", List(Variable("Y'"), Variable("X'"))), Fact("male", List(Variable("X'")))))
+  private val relRuleSubstituted = Rule(Fact("son", List(Atom(1), Struct("s", List(Variable("Y'"))))),
+    List(Fact("father", List(Struct("s", List(Variable("Y'"))), Atom(1))), Fact("male", List(Atom(1)))))
 
   "A term list" should "retrieve all the variables it contains" in {
     mulTheory(3).asInstanceOf[Rule].head.args.getVariables shouldBe mulRuleHeadVariables

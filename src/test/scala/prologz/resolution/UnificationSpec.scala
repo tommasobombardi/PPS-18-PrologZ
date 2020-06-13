@@ -15,18 +15,15 @@ class UnificationSpec extends AnyFlatSpec with Matchers with PrologSamples {
 
   private val mulTheoryFacts = mulTheory.flatMap{ case fact: Fact => fact.some; case _ => none[Fact] }
   private val mulTheoryRules = mulTheory.flatMap{ case rule: Rule => rule.some; case _ => none[Rule] }
+  private val mulGoalRes = Substitution(Variable("X") -> Struct("s", List(Struct("s", List(Atom(0))))), Variable("Y'") -> Struct("s", List(Atom(0))), Variable("Y") -> Variable("Z"))
+  private val otherMulGoal = Fact("mul", List(Struct("s", List(Struct("s", List(Atom(0))))), Atom(0), Variable("Y")))
+  private val otherMulGoalRes = Substitution(Variable("X") -> Struct("s", List(Struct("s", List(Atom(0))))), Variable("Y") -> Atom(0))
 
   private val relTheoryFacts = relTheory.flatMap{ case fact: Fact => fact.some; case _ => none[Fact] }
   private val relTheoryRules = relTheory.flatMap{ case rule: Rule => rule.some; case _ => none[Rule] }
-
-  private val otherMulGoal = Fact("mul", List(Struct("s", List(Struct("s", List(Atom(0))))), Atom(0), Variable("Y")))
-  private val otherMulGoalRes = Substitution(Variable("X") -> Struct("s", List(Struct("s", List(Atom(0))))), Variable("Y") -> Atom(0))
-  private val mulGoalRes = Substitution(Variable("X") -> Struct("s", List(Struct("s", List(Atom(0))))),
-    Variable("Y'") -> Struct("s", List(Atom(0))), Variable("Y") -> Variable("Z"))
-
+  private val relGoalRes = Substitution(Variable("X") -> Variable("X'"), Variable("Y") -> Variable("Y'"))
   private val otherRelGoal = Fact("father", List(Variable("X"), Variable("Y")))
   private val otherRelGoalRes = Substitution(Variable("X") -> Atom("abraham"), Variable("Y") -> Atom("isaac"))
-  private val relGoalRes = Substitution(Variable("X") -> Variable("X'"), Variable("Y") -> Variable("Y'"))
 
   "A theory fact" should "not unify with a goal having a different predicate name" in {
     for(theory <- mulTheoryFacts; goal <- mulGoals if theory.name =/= goal.name) theory.unify(goal, Nil) shouldBe empty

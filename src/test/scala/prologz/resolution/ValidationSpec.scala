@@ -11,18 +11,16 @@ import prologz.utils.PrologSamples
 class ValidationSpec extends AnyFlatSpec with Matchers with PrologSamples {
 
   private val mulGoalsNoErrors = List(Predicate("mul")(Struct("s")(Struct("s")(0)), Struct("s")(Struct("s")(0)), "Y"))
+  private val mulGoalsWithErrors = List(Predicate("Mul")(Struct("s")(Struct("s1")(0)), Struct("S")(Struct("s")(0)), "Y_")) // 4 errors
   private val mulTheoryNoErrors = List(Predicate("sum")("X", 0, "X"), Predicate("sum")("X", Struct("s")("Y"), Struct("s")("Z")) :- Predicate("sum")("X", "Y", "Z"),
     Predicate("mul")("X", 0, 0), Predicate("mul")("X", Struct("s")("Y"), "Z") :- (Predicate("mul")("X", "Y", "W"), Predicate("sum")("X", "W", "Z")))
-
-  private val relGoalsNoErrors = List(Predicate("son")("X", "Y"))
-  private val relTheoryNoErrors = List(Predicate("son")("X", "Y") :- (Predicate("father")("Y", "X"), Predicate("male")("X")),
-    Predicate("father")("abraham", "isaac"), Predicate("father")("terach", "abraham"), Predicate("male")("isaac"), Predicate("male")("abraham"), Predicate("male")("terach"))
-
-  private val mulGoalsWithErrors = List(Predicate("Mul")(Struct("s")(Struct("s1")(0)), Struct("S")(Struct("s")(0)), "Y_")) // 4 errors
   private val mulTheoryWithErrors = List(Predicate("Sum")("X4", 0, "X"), Predicate("sum")("X", Struct("Ss")("Y"), Struct("s")("Z++")) :- Predicate("sum")("X", "Y.", "Z"),
     Predicate("mul")("X", 0, 0), Predicate("mul")("X", Struct("s")(":Y"), "Z") :- (Predicate("Mul")("X", "Y", "W"), Predicate("sum")("Xè", "W", "Z"))) // 7 errors
 
+  private val relGoalsNoErrors = List(Predicate("son")("X", "Y"))
   private val relGoalsWithErrors = List(Predicate("Son")("X", "34Y")) // 2 errors
+  private val relTheoryNoErrors = List(Predicate("son")("X", "Y") :- (Predicate("father")("Y", "X"), Predicate("male")("X")),
+    Predicate("father")("abraham", "isaac"), Predicate("father")("terach", "abraham"), Predicate("male")("isaac"), Predicate("male")("abraham"), Predicate("male")("terach"))
   private val relTheoryWithErrors = List(Predicate("son")("X", "Y") :- (Predicate("father//")("Y", "X"), Predicate("male")("X")), Predicate("father")("abraham3", "isaac"),
     Predicate("father")("terach", "abraham"), Predicate("male_")("isaac"), Predicate("male")("abraham"), Predicate("male")("terach")) // 3 errors
 
