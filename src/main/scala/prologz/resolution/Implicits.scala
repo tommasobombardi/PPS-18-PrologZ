@@ -14,7 +14,7 @@ import prologz.resolution.Substitution.Substitution
 /** Implicit helpers for [[prologz.dsl.Term]] and [[prologz.dsl.Clause]] instances */
 private[prologz] object Implicits {
 
-  trait RichElement[A] {
+  sealed trait RichElement[A] {
     /** Retrieves variables
      *
      *  @return all variables contained in the element
@@ -83,7 +83,7 @@ private[prologz] object Implicits {
   private def renameTerms(terms: List[Term], variables: Set[Variable], notValidVars: Set[Variable], attempt: Int = 1): List[Term] = terms match {
     case (v: Variable) :: _ if variables.contains(v) && notValidVars.contains(Variable(v.name + ("'" * attempt))) => renameTerms(terms, variables, notValidVars, attempt + 1)
     case (v: Variable) :: other if variables.contains(v) => Variable(v.name + ("'" * attempt)) :: renameTerms(other, variables, notValidVars)
-    case (s: Struct) :: other => Struct(s.name, renameTerms(s.args, variables, variables |+| s.args.getVariables)) :: renameTerms(other, variables, notValidVars)
+    case (s: Struct) :: other => Struct(s.name, renameTerms(s.args, variables, notValidVars)) :: renameTerms(other, variables, notValidVars)
     case term :: other => term :: renameTerms(other, variables, notValidVars)
     case _ => Nil
   }

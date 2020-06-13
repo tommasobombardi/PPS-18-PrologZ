@@ -7,7 +7,7 @@ import scala.language.implicitConversions
 import prologz.resolution.InputError
 import prologz.resolution.Validation.{InputError, PzValidation}
 
-/** Implicit conversions and helpers for [[prologz.dsl.Clause]] instances */
+/** Implicit helpers for [[prologz.dsl.Clause]] instances */
 object ClauseImplicits {
 
   implicit class PredicateRich(base: PzValidation[String @@ Predicate]) {
