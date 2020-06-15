@@ -47,6 +47,30 @@ Per quanto riguarda i costrutti di Prolog supportati dal DSL, si è scelto di mo
 
 Le modalità standard per la costruzione di valori di questi tipi sono però nascoste agli utilizzatori del DSL, che hanno a disposizione solo quanto visto nella sezione precedente per definire gli elementi del programma Prolog. Il motivo di questa scelta è evidente se si considerano le definizioni dei metodi \textit{addTheory}, \textit{solve} e \textit{solveAll} presenti in \textit{Engine}: essi accettano rispettivamente \textit{PzValidation[Clause]*} e \textit{PzValidation[Fact]*} (invece di \textit{Clause*} e \textit{Fact*}).
 
+\textit{PzValidation[A]} è un semplice type alias che corrisponde a \textit{ValidationNel[String @@ InputError, A]}, dove String @@ InputError è un tipo usato per rappresentare gli errori nella definizione del programma Prolog. Tutti gli elementi presenti al suo interno, a partire dai più semplici come termini costanti e variabili, sono creati come istanze di \textit{PzValidation[A]} (A è il tipo che rappresenta quell'elemento) e possono quindi incapsulare errori nella loro definizione.
+
+In questo modo, sfruttando la possibilità di accumulare gli errori offerta dal costrutto \textit{Validation} e la sintassi proposta dall'\textit{Applicative Builder} per gestire i casi di successo, è stato realizzato il meccanismo di validazione dell'input descritto in precedenza. In caso di errori viene semplicemente restituito un report, evitando di lanciare eccezioni e di interrompere l'esecuzione.
+
+Un altro vantaggio si ha nel caso di più programmi Prolog da eseguire: se sono presenti errori in alcuni di essi, gli altri vengono risolti normalmente.
+
+\lstinputlisting[caption=Metodi per la creazione di \textit{PzValidation[Term]} e per la concatenazione di \textit{PzValidation[Clause]} e di \textit{PzValidation[Fact]}]{code/PrologValidation.scala}
+
 \subsection{Prolog execution}
+
+L'esecuzione dei programmi Prolog è basata sulla costruzione dell'SLD tree, un albero in cui ogni nodo corrisponde ad una coppia contenente sia i goal che devono ancora essere risolti sia una sostituzione che rappresenta una soluzione valida per i goal che sono stati risolti fino a quel momento.
+
+Nella programmazione logica, una sostituzione è definita come una mappa finita da variabili a termini e, quindi, si è scelto di rappresentarla tramite l'alias \textit{type Substitution = Map[Variable, Term]}. Il meccanismo di risoluzione di Prolog prevede che più sostituzioni debbano poter essere unite in un'unica sostituzione avente come effetto l'esecuzione sequenziale delle varie sostituzioni considerate: dati due goal R1 e R2 risolti rispettivamente dalle sostituzioni A e B, la loro soluzione sarà rappresentata da una sostituzione AB con effetto equivalente all'applicazione di A seguita dall'applicazione di B.
+
+La politica di combinazione delle mappe offerta da Scalaz con l'implementazione di \textit{Monoid[Map]} non è adatta alle sostituzioni, perché le unisce semplicemente e sovrascrive i valori che compaiono più volte. Ad esempio, date due sostituzioni A=\{X/2,Y/X\} e B=\{X/3\}, si ottiene come risultato AB=\{Y/X,X/3\} mentre la sostituzione equivalente è AB=\{X/2,Y/3\}.
+
+Perciò è stata definita una nuova implementazione di \textit{Monoid[Substitution]}, in cui aggiungere una sostituzione ad un'altra equivale ad applicarla a tutti i termini nelle relazioni variabile/termine della prima sostituzione. In questo modo è sufficiente usare l'operatore |+| per unire le sostituzioni ma, affinché il procedimento funzioni, è necessario che la sostituzione inziale sia un'identità in cui ogni variabile presente nei goal è associata a sé stessa.
+
+\lstinputlisting[caption={Definizione di \textit{SubstitutionMonoid}, il metodo \textit{substitute} consente (utilizzando un implicito) di applicare una sostituzione ad una lista di termini}]{code/PrologSubstitution.scala}
+
+Dopo aver stabilito come rappresentare e unire le sostituzioni, è stato possibile implementare il meccanismo di risoluzione. Esso prevede che tutti i programmi Prolog siano convertiti in alberi SLD, realizzati e gestiti sfruttando le strutture dati \textit{Tree} e \textit{TreeLoc} offerte da Scalaz. Per ogni nodo dell'albero, oltre ai goal da risolvere e alla sostituzione eseguita, è memorizzata una lista di clausole che rappresentano la parte di teoria non ancora considerata.
+
+Inizialmente, l'albero sarà costituito da un solo nodo contenente la teoria del programma, i goal e la sostituzione identità.
+
+\lstinputlisting[caption=a]{code/PrologTree.scala}
 
 \subsection{Unification}
