@@ -1,23 +1,52 @@
-\chapter{PrologZ} % Main chapter title
+\chapter{DSL for Logic Programming} % Main chapter title
 
 \label{Chapter2} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
-Introduzione
+Questo secondo capitolo sarà dedicato alla presentazione del caso d'uso della libreria Scalaz realizzato in questo elaborato. Si è scelto di sfruttare alcune delle astrazioni offerte da Scalaz per implementare un DSL che imiti Prolog, in modo da fornire un supporto diretto alla programmazione logica.
+
+Il DSL ha l'obiettivo di offrire un'interfaccia quanto più possibile semplice e simile a Prolog, ma che consenta di scrivere programmi direttamente in Scala. L'esecuzione di questi ultimi sarà basata sulla tecnica di risoluzione comunemente usata dai motori logici, ossia quella che prevede la costruzione di un SLD tree, e anch'essa sarà implementata con l'ausilio di Scalaz.
 
 %----------------------------------------------------------------------------------------
 %	SECTION 1
 %----------------------------------------------------------------------------------------
 
-\section{Sezione 1}
+\section{Available features}
+
+Il DSL realizzato supporta una parte di quanto offerto dal linguaggio Prolog e, di seguito, sono riportate le funzionalità che mette a disposizione:
+
+\begin{itemize}
+\item Numeri di tipo \textit{Int} e \textit{Double} possono essere utilizzati per rappresentare rispettivamente i numeri interi e decimali presenti in Prolog.
+\item Stringhe che iniziano con una lettera minuscola corrispondono a dei termini costanti, mentre le stringhe il cui primo carattere è costituito da una lettera maiuscola equivalgono a delle variabili.
+\item Mentre in fase di compilazione tutte le stringhe vengono accettate in quanto termini, a run-time non sono considerate valide le stringhe vuote e quelle che non contengono solo lettere. Quest'ultimo vincolo è stato aggiunto per colmare il gap tra un linguaggio che è tipato staticamente (Scala) e uno che non lo è (Prolog). Sono infatti evitati i casi in cui si confronta un numero (ad esempio 1) e la stringa corrispondente (``1''), che in Prolog non possono verificarsi. Inoltre, escludere i caratteri speciali consente alle stringhe di non contenere delimitatori come ``,'' e ``)''.
+\item È possibile creare un funtore usando il metodo \textit{apply} dell'oggetto \textit{Struct} e specificando il nome del funtore, che deve essere una stringa non vuota, contenere solo lettere e iniziare con una lettera minuscola.
+\item A sua volta, un funtore offre un metodo \textit{apply} che accetta un numero variabile di termini e restituisce un termine composto. È previsto un errore se non viene passato nessun termine quando si usa un funtore. Se si divide la definizione del funtore dalla creazione del termine composto, questa operazione è molto simile a ciò che si farebbe in Prolog.
+
+\lstinputlisting{code/PrologCompound.scala}
+\item In modo speculare a quanto visto per funtori e termini composti, il DSL offre l'oggetto \textit{Predicate} con cui è possibile inizializzare dei predicati che a loro volta sono utilizzabili per la creazione di fatti.
+\item Sono supportate le regole, che possono essere definite a partire da un fatto chiamando il metodo :- e passando ad esso un numero variabile di fatti (previsto un errore in assenza di argomenti). Il fatto su cui viene chiamato il metodo costituisce la testa della regola, mentre gli argomenti corrispondono al suo corpo. La notazione infissa disponibile in Scala rende naturale la definizione di regole, ma è importante ricordare che si tratta di una chiamata di metodo e quindi, se il corpo della regola contiene più fatti, è necessario racchiuderli tra parentesi.
+
+\lstinputlisting{code/PrologRule.scala}
+\item Gli elementi descritti finora consentono di definire un programma Prolog, che è costituito da una serie di clausole corrispondenti alla teoria (che possono essere fatti o regole) e da un insieme di fatti che rappresentano i goal. Per la loro risoluzione il DSL fornisce un oggetto \textit{Engine}, che costituisce il motore logico condiviso nell'applicazione.
+\item \textit{Engine} consente di aggiungere e resettare la teoria del programma, tramite i metodi \textit{addTheory} e \textit{resetTheory}, e fornisce due modalità di risoluzione alternative (le stesse offerte da tuProlog), grazie ai metodi \textit{solve} e \textit{solveAll}, con cui è possibile risolvere uno o più goal. Nella prima modalità la computazione procede finché non viene trovata una soluzione e, in quel momento, l'utente può scegliere se interrompere l'esecuzione o proseguire fino alla soluzione successiva. Nella seconda modalità, invece, sono esplorate tutte le possibili alternative. È inoltre possibile abilitare la stampa dell'albero di esecuzione del programma.
+\item Come si può facilmente intuire, ogni chiamata di \textit{solve} o \textit{solveAll} corrisponde all'esecuzione di un programma Prolog. Per ognuna di esse \textit{Engine} porta a termine un procedimento di validazione dell'input, che prevede la mancata esecuzione del programma in caso di errori nei suoi elementi (variabili, termini costanti, termini composti, fatti o regole) e la restituzione di un report contenente tutti gli errori trovati.
+\end{itemize}
+
+Per utilizzare il DSL è sufficiente specificare gli statement \textit{import prologz.dsl.\_}, con cui si ottengono tutti i costrutti visti in precedenza, \textit{import prologz.dsl.ClauseImplicits.\_} e \textit{import prologz.dsl.TermImplicits.\_}, che mettono a disposizione le conversioni implicite necessarie per la definizione di termini, fatti e regole.
 
 %----------------------------------------------------------------------------------------
 %	SECTION 2
 %----------------------------------------------------------------------------------------
 
-\section{Sezione 2}
+\section{Implementation details}
 
-%----------------------------------------------------------------------------------------
-%	SECTION 3
-%----------------------------------------------------------------------------------------
+Il codice realizzato è suddiviso in due package: \textit{prologz.dsl}, che contiene la definizione di tutti gli elementi di Prolog supportati dal DSL e gli strumenti messi a disposizione degli utilizzatori del DSL, e \textit{prologz.resolution}, destinato a ciò che è necessario per la risoluzione dei programmi Prolog.
 
-\section{Sezione 3}
+\subsection{Program validation}
+
+Per quanto riguarda i costrutti di Prolog supportati dal DSL, si è scelto di modellare i termini come case class che definiscono dei sottotipi del trait \textit{Term}: \textit{Atom[A]} per i termini costanti e i numeri (interi o decimali), \textit{Variable} per le variabili e \textit{Struct} per i termini composti. Allo stesso modo, le case class \textit{Fact} e \textit{Rule} corrispondono ai fatti e alle regole ed estendono il trait \textit{Clause}. Funtori e predicati sono invece rappresentati tramite stringhe taggate, rispettivamente \textit{String @@ Functor} e \textit{String @@ Predicate}, poiché si tratta semplicemente di elementi che devono essere in grado di incapsulare una stringa.
+
+Le modalità standard per la costruzione di valori di questi tipi sono però nascoste agli utilizzatori del DSL, che hanno a disposizione solo quanto visto nella sezione precedente per definire gli elementi del programma Prolog. Il motivo di questa scelta è evidente se si considerano le definizioni dei metodi \textit{addTheory}, \textit{solve} e \textit{solveAll} presenti in \textit{Engine}: essi accettano rispettivamente \textit{PzValidation[Clause]*} e \textit{PzValidation[Fact]*} (invece di \textit{Clause*} e \textit{Fact*}).
+
+\subsection{Prolog execution}
+
+\subsection{Unification}
