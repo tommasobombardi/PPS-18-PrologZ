@@ -88,13 +88,13 @@ Al contrario, se l'unificazione non ha successo, la procedura viene chiamata ric
 
 Finora l'unificazione è stata vista come un procedimento ``black box'', che confronta un fatto o una regola (ossia una clausola appartenente alla teoria) con un altro fatto (goal) e, in caso di successo, restituisce una sostituzione corrispondente al risultato e i goal che devono ancora essere risolti.
 
-L'implementazione dell'unificazione è contenuta nel metodo \textit{unify}, disponibile grazie agli impliciti (in modo simile a quanto fatto da Scalaz con la \textit{method injection}) su qualunque clausola. In base al tipo di clausola (fatto o regola), il procedimento è differente. In entrambi i casi è molto importante il ruolo dei goal restanti da eseguire, che sono modificati in base al risultato dell'unificazione. Perciò si è scelto di implementare l'unificazione basandosi sul trasformatore della state monad \textit{StateT}, in cui lo stato è costituito dai goal che non sono ancora stati risolti ed è prevista l'opzionalità.
+L'implementazione dell'unificazione è contenuta nel metodo \textit{unify}, disponibile grazie agli impliciti (in modo simile a quanto fatto da Scalaz con la \textit{method injection}) su qualunque clausola. In base al tipo di clausola (fatto o regola), il procedimento è differente. In entrambi i casi è molto importante il ruolo dei goal restanti da eseguire, che sono modificati in base al risultato dell'unificazione. Perciò si è scelto di implementare l'unificazione basandosi sul trasformatore della state monad, \textit{StateT}, in cui lo stato è costituito dai goal che non sono ancora stati risolti ed è prevista l'opzionalità.
 
 L'unificazione di due fatti prevede le seguenti operazioni:
 
 \begin{enumerate}
 \item Controllare se il fatto e il goal sono caratterizzati dallo stesso nome e dalla stessa arità e, in caso contrario, restituire un esito negativo.
-\item Rinominare le variabili presenti nel fatto corrente, in modo che non vi siano né variabili comuni al goal con cui deve essere unificato il fatto né variabili comuni agli altri goal che devono essere risolti. Questo perché se una variabile compare due volte nei goal (anche in goal differenti), deve essere associata ad uno stesso termine. Si tratta però di un vincolo che deve poter essere espresso solo in fase di definizione dei goal, e che non può derivare dall'unificazione con una clausola della teoria.
+\item Rinominare le variabili presenti nel fatto appartenente alla teoria, in modo che non vi siano né variabili comuni al goal con cui deve essere unificato né variabili comuni agli altri goal da risolvere. Questo perché se una variabile compare due volte nei goal (anche in goal differenti), deve essere associata ad uno stesso termine. Si tratta però di un vincolo che deve poter essere espresso solo in fase di definizione dei goal, e che non può derivare dall'unificazione con una clausola della teoria.
 \item Unificare gli argomenti del fatto e del goal, seguendo le regole previste da Prolog per l'unificazione di termini. In caso di successo, mantenere la sostituzione ed eliminare il goal corrente da quelli da risolvere.
 \item Applicare la sostituzione trovata ai goal che devono ancora essere risolti e restituire una tupla contenente sia questi sia la sostituzione. È importante notare che, grazie al comportamento \textit{first-fail} di \textit{StateT}, questa operazione non viene eseguita se l'unificazione ha esito negativo.
 \end{enumerate}
@@ -113,7 +113,12 @@ Unificare una regola con un fatto è invece un procedimento leggermente più com
 
 \section{Final remarks}
 
-Al momento il numero di funzionalità presenti in Prolog e supportate dal DSL è limitato, ma ritengo che possa costituire una buona base per estensioni future che supportino altre funzionalità. Ad esempio, non dovrebbe essere eccessivamente complicato aggiungere il supporto alle liste e l'operatore ``'!''.
+Il numero di funzionalità presenti in Prolog e supportate dal DSL è ancora limitato, ma ritengo che possa costituire una base valida per estensioni che supportino altre funzionalità. Ad esempio, non dovrebbe essere eccessivamente complicato aggiungere il supporto alle liste e l'operatore ``'!''.
 
+Attualmente l'interazione prevista consente soltanto di visualizzare a riga di comando i risultati dei programmi risolti. Sarebbe però molto semplice modificare l'interfaccia di \textit{Engine} e ottenere le soluzioni sotto forma di valori tipati, in modo da facilitare l'integrazione con altre applicazioni (ad esempio, con giochi che definiscono la propria logica utilizzando Prolog).
 
-interazione NON a riga di comando che potresti aggiungere
+A mio parere, Scalaz si è rivelato un ottimo strumento ed ha rappresentato un valido ausilio per la realizzazione di questo progetto. Le strutture funzionali che offre hanno infatti consentito di implementare meccanismi complessi in modo ancor più naturale e semplice di quanto possibile in Scala.
+
+Come visto in precedenza, nell'implementazione del DSL sono state fondamentali anche le caratteristiche messe a disposizione nativamente da Scala, quali ad esempio case class, pattern matching e conversioni implicite. In particolare, grazie a queste ultime è stato possibile consentire di scrivere in Scala programmi molto simili a quelli Prolog ed è stata evidente l'importanza ricoperta da questi strumenti nella realizzazione di un qualsiasi DSL.
+
+Infine, i test realizzati con ScalaTest (e presenti nel package \textit{test.scala.prologz}) hanno consentito di verificare il funzionamento di quanto implementato e costituiscono una valida specifica del comportamento del sistema.
