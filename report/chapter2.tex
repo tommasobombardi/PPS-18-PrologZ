@@ -104,7 +104,7 @@ Unificare una regola con un fatto è invece un procedimento leggermente più com
 \begin{itemize}
 \item Replicare i primi tre passi previsti per l'unificazione di fatti. In particolare: eseguire il controllo sulla testa della regola e sul goal, rinominare sia la testa sia il corpo della regola evitando le variabili contenute nei vari goal e unificare gli argomenti della testa della regola e del goal.
 \item Se l'unificazione ha successo, aggiungere ai goal da risolvere i fatti presenti nel corpo della regola. Prima è però necessario rinominare le variabili presenti nel corpo della regola ma non nella sua testa (le variabili in testa sono già state considerate), facendo in modo che non compaiano anche negli altri goal. Si evita così l'aggiunta di vincoli inesistenti che possono precludere la corretta risoluzione del programma.
-\item Infine, come nel punto 4 visto per l'unificazione di fatti, si applica la sostituzione trovata ai goal che devono ancora essere risolti e viene restituita una tupla contenente sia questi sia la sostituzione
+\item Infine, come nel punto 4 visto per l'unificazione di fatti, si applica la sostituzione trovata ai goal che devono ancora essere risolti e viene restituita una tupla contenente sia questi sia la sostituzione.
 \end{itemize}
 
 %----------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ Unificare una regola con un fatto è invece un procedimento leggermente più com
 
 Il numero di funzionalità presenti in Prolog e supportate dal DSL è ancora limitato, ma ritengo che possa costituire una base valida per estensioni che supportino altre funzionalità. Ad esempio, non dovrebbe essere eccessivamente complicato aggiungere il supporto alle liste e l'operatore ``'!''.
 
-Attualmente l'interazione prevista consente soltanto di visualizzare a riga di comando i risultati dei programmi risolti. Sarebbe però molto semplice modificare l'interfaccia di \textit{Engine} e ottenere le soluzioni sotto forma di valori tipati, in modo da facilitare l'integrazione con altre applicazioni (ad esempio, con giochi che definiscono la propria logica utilizzando Prolog).
+Attualmente l'interazione prevista consente soltanto di visualizzare a riga di comando i risultati dei programmi risolti. Sarebbe però semplice modificare l'interfaccia presente in \textit{Engine} e ottenere le soluzioni sotto forma di valori tipati, in modo da facilitare l'integrazione con altre applicazioni (ad esempio, con giochi che definiscono la propria logica utilizzando Prolog).
 
 A mio parere, Scalaz si è rivelato un ottimo strumento ed ha rappresentato un valido ausilio per la realizzazione di questo progetto. Le strutture funzionali che offre hanno infatti consentito di implementare meccanismi complessi in modo ancor più naturale e semplice di quanto possibile in Scala.
 
