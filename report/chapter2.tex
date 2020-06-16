@@ -69,8 +69,51 @@ Perciò è stata definita una nuova implementazione di \textit{Monoid[Substituti
 
 Dopo aver stabilito come rappresentare e unire le sostituzioni, è stato possibile implementare il meccanismo di risoluzione. Esso prevede che tutti i programmi Prolog siano convertiti in alberi SLD, realizzati e gestiti sfruttando le strutture dati \textit{Tree} e \textit{TreeLoc} offerte da Scalaz. Per ogni nodo dell'albero, oltre ai goal da risolvere e alla sostituzione eseguita, è memorizzata una lista di clausole che rappresentano la parte di teoria non ancora considerata.
 
-Inizialmente, l'albero sarà costituito da un solo nodo contenente la teoria del programma, i goal e la sostituzione identità.
+Inizialmente l'albero di risoluzione è costituito da un solo nodo contenente la teoria del programma, i goal e una sostituzione identità. In seguito questo nodo, quello attualmente selezionato nel \textit{TreeLoc} dell'albero, viene passato ad una procedura ricorsiva (implementata dal metodo \textit{navigatePrologTree} e richiamata grazie a \textit{searchPrologTree}) che si comporta come segue:
 
-\lstinputlisting[caption=a]{code/PrologTree.scala}
+\begin{itemize}
+\item Se la teoria e i goal non sono vuoti, la prima clausola presente nella teoria viene rimossa dal nodo attuale perché, al termine della chiamata in corso, non dovrà più essere considerata. Si esegue quindi l'unificazione (disponibile grazie al metodo \textit{unify}) tra questa clausola e il primo goal.
+
+Se ha successo, l'unificazione restituisce la sostituzione corrispondente alla soluzione e i goal rimanenti: nel caso di un fatto si tratta degli altri goal dopo l'applicazione della sostituzione, mentre nel caso di una regola è considerato anche il suo corpo. Viene quindi aggiunto un nodo all'albero (ultimo figlio del nodo corrente) contenente tutte le clausole di teoria previste dal programma (possono essere utilizzate di nuovo tutte per risolvere gli altri goal), i goal rimanenti e l'unione tra la sostituzione presente nel nodo corrente e quella ottenuta con l'unificazione. La procedura è chiamata ricorsivamente su questo nodo.
+
+Al contrario, se l'unificazione non ha successo, la procedura viene chiamata ricorsivamente sul nodo corrente. In questo modo, è possibile tentare di unificare il primo goal con tutte le clausole della teoria.
+\item Se la teoria è vuota ma devono ancora essere risolti uno o più goal ed è definito il padre del nodo corrente, è facile capire che quest'ultimo rappresenta una foglia in cui non è stata trovata nessuna soluzione. Perciò, viene eseguito automaticamente il \textit{backtracking} e la procedura è richiamata ricorsivamente sul nodo padre del nodo corrente.
+\item Se non si verificano i due casi precedenti, il nodo corrente può rappresentare una foglia contenente una soluzione valida o la radice (e quindi la fine della computazione). La procedura termina restituendo in entrambi i casi il nodo corrente e offre così la possibilità di interrompere la computazione ogni volta che viene trovata una soluzione.
+\item Il metodo \textit{searchPrologTree} permette di riprendere l'esplorazione dell'albero di risoluzione da qualsiasi punto, eseguendo il \textit{backtracking} se il nodo corrente non è la radice. La sua esecuzione ripetuta consente di trovare tutte le soluzioni disponibili per un programma Prolog.
+\end{itemize}
+
+\lstinputlisting[caption=Costruzione dell'albero di risoluzione Prolog]{code/PrologTree.scala}
 
 \subsection{Unification}
+
+Finora l'unificazione è stata vista come un procedimento ``black box'', che confronta un fatto o una regola (ossia una clausola appartenente alla teoria) con un altro fatto (goal) e, in caso di successo, restituisce una sostituzione corrispondente al risultato e i goal che devono ancora essere risolti.
+
+L'implementazione dell'unificazione è contenuta nel metodo \textit{unify}, disponibile grazie agli impliciti (in modo simile a quanto fatto da Scalaz con la \textit{method injection}) su qualunque clausola. In base al tipo di clausola (fatto o regola), il procedimento è differente. In entrambi i casi è molto importante il ruolo dei goal restanti da eseguire, che sono modificati in base al risultato dell'unificazione. Perciò si è scelto di implementare l'unificazione basandosi sul trasformatore della state monad \textit{StateT}, in cui lo stato è costituito dai goal che non sono ancora stati risolti ed è prevista l'opzionalità.
+
+L'unificazione di due fatti prevede le seguenti operazioni:
+
+\begin{enumerate}
+\item Controllare se il fatto e il goal sono caratterizzati dallo stesso nome e dalla stessa arità e, in caso contrario, restituire un esito negativo.
+\item Rinominare le variabili presenti nel fatto corrente, in modo che non vi siano né variabili comuni al goal con cui deve essere unificato il fatto né variabili comuni agli altri goal che devono essere risolti. Questo perché se una variabile compare due volte nei goal (anche in goal differenti), deve essere associata ad uno stesso termine. Si tratta però di un vincolo che deve poter essere espresso solo in fase di definizione dei goal, e che non può derivare dall'unificazione con una clausola della teoria.
+\item Unificare gli argomenti del fatto e del goal, seguendo le regole previste da Prolog per l'unificazione di termini. In caso di successo, mantenere la sostituzione ed eliminare il goal corrente da quelli da risolvere.
+\item Applicare la sostituzione trovata ai goal che devono ancora essere risolti e restituire una tupla contenente sia questi sia la sostituzione. È importante notare che, grazie al comportamento \textit{first-fail} di \textit{StateT}, questa operazione non viene eseguita se l'unificazione ha esito negativo.
+\end{enumerate}
+
+Unificare una regola con un fatto è invece un procedimento leggermente più complesso, che è caratterizzato dalle seguenti operazioni:
+
+\begin{itemize}
+\item Replicare i primi tre passi previsti per l'unificazione di fatti. In particolare: eseguire il controllo sulla testa della regola e sul goal, rinominare sia la testa sia il corpo della regola evitando le variabili contenute nei vari goal e unificare gli argomenti della testa della regola e del goal.
+\item Se l'unificazione ha successo, aggiungere ai goal da risolvere i fatti presenti nel corpo della regola. Prima è però necessario rinominare le variabili presenti nel corpo della regola ma non nella sua testa (le variabili in testa sono già state considerate), facendo in modo che non compaiano anche negli altri goal. Si evita così l'aggiunta di vincoli inesistenti che possono precludere la corretta risoluzione del programma.
+\item Infine, come nel punto 4 visto per l'unificazione di fatti, si applica la sostituzione trovata ai goal che devono ancora essere risolti e viene restituita una tupla contenente sia questi sia la sostituzione
+\end{itemize}
+
+%----------------------------------------------------------------------------------------
+%	SECTION 3
+%----------------------------------------------------------------------------------------
+
+\section{Final remarks}
+
+Al momento il numero di funzionalità presenti in Prolog e supportate dal DSL è limitato, ma ritengo che possa costituire una buona base per estensioni future che supportino altre funzionalità. Ad esempio, non dovrebbe essere eccessivamente complicato aggiungere il supporto alle liste e l'operatore ``'!''.
+
+
+interazione NON a riga di comando che potresti aggiungere
