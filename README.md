@@ -6,6 +6,6 @@ This project is made using Scalaz, a library for functional programming that com
 
 What I studied about Scalaz and the details of this project implementation are available in [report](report.pdf).
 
-The code is organized in two packages: [prologz/dsl](src/main/scala/prologz/dsl), which contains the definition of all elements available to users, and [prologz/resolution](src/main/scala/prologz/resolution), containing what is needed to solve Prolog programs.
+The code is organized in two packages: [prologz/dsl](src/main/scala/prologz/dsl), which contains the definition of all elements available to users, and [prologz/resolution](src/main/scala/prologz/resolution), containing the implementation of the resolution mechanism
 
 The [samples package](src/main/scala/samples) holds some simple examples of writing and solving Prolog programs with the DSL.
