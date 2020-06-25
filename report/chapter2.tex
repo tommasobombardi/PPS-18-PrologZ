@@ -33,17 +33,47 @@ Il DSL realizzato supporta una parte di quanto offerto dal linguaggio Prolog e, 
 
 Per utilizzare il DSL è sufficiente specificare gli statement \textit{import prologz.dsl.\_}, con cui si ottengono tutti i costrutti visti in precedenza, \textit{import prologz.dsl.ClauseImplicits.\_} e \textit{import prologz.dsl.TermImplicits.\_}, che mettono a disposizione le conversioni implicite necessarie per la definizione di termini, fatti e regole.
 
+\begin{figure}[th]
+\centering
+\includegraphics[scale=0.79]{images/DiagramUseCase}
+\decoRule
+\caption[DiagramUseCase]{Diagramma dei casi d'uso in cui è rappresentata l'interazione tra il DSL e i suoi utenti (sviluppatori che lo usano)}
+\end{figure}
+
 %----------------------------------------------------------------------------------------
 %	SECTION 2
 %----------------------------------------------------------------------------------------
 
 \section{Implementation details}
 
-Il codice realizzato è suddiviso in due package: \textit{prologz.dsl}, che contiene la definizione di tutti gli elementi di Prolog supportati dal DSL e gli strumenti messi a disposizione degli utilizzatori del DSL, e \textit{prologz.resolution}, destinato a ciò che è necessario per la risoluzione dei programmi Prolog.
+Il codice realizzato è suddiviso in due package: \textit{prologz.dsl}, che contiene la definizione degli elementi di Prolog supportati dal DSL e gli strumenti offerti agli utilizzatori, e \textit{prologz.resolution}, destinato a ciò che è necessario per la risoluzione dei programmi. I principali componenti del DSL sono i seguenti:
+
+\begin{itemize}
+\item \textit{Engine}, che costituisce il motore logico messo a disposizione.
+\item \textit{Validation}, un'entità ``posseduta'' da \textit{Engine} e grazie a cui è possibile eseguire il procedimento di validazione dei programmi Prolog.
+\item \textit{PrologTree}, che consente di creare e navigare l'albero di risoluzione.
+\item \textit{Substitution}, ossia la modellazione del concetto di sostituzione.
+\item \textit{RichClause}, usato da \textit{PrologTree} e che offre ad una clausola (fatto o regola) la possibilità di essere unificata con un altro fatto.
+\item \textit{RichElement}, le cui implementazioni forniscono la possibilità di applicare una sostituzione, rinominare o ottenere le variabili presenti in diversi elementi, come ad esempio fatti o regole.
+\end{itemize}
+
+\begin{figure}[th]
+\centering
+\includegraphics[scale=1.02]{images/DiagramDesign}
+\decoRule
+\caption[DiagramDesign]{Design ad alto livello del DSL}
+\end{figure}
 
 \subsection{Program validation}
 
 Per quanto riguarda i costrutti di Prolog supportati dal DSL, si è scelto di modellare i termini come case class che definiscono dei sottotipi del trait \textit{Term}: \textit{Atom[A]} per i termini costanti e i numeri (interi o decimali), \textit{Variable} per le variabili e \textit{Struct} per i termini composti. Allo stesso modo, le case class \textit{Fact} e \textit{Rule} corrispondono ai fatti e alle regole ed estendono il trait \textit{Clause}. Funtori e predicati sono invece rappresentati tramite stringhe taggate, rispettivamente \textit{String @@ Functor} e \textit{String @@ Predicate}, poiché si tratta semplicemente di elementi che devono essere in grado di incapsulare una stringa.
+
+\begin{figure}[th]
+\centering
+\includegraphics[scale=0.86]{images/DiagramClauseTerm}
+\decoRule
+\caption[DiagramClauseTerm]{Diagramma delle classi per termini e clausole}
+\end{figure}
 
 Le modalità standard per la costruzione di valori di questi tipi sono però nascoste agli utilizzatori del DSL, che hanno a disposizione solo quanto visto nella sezione precedente per definire gli elementi del programma Prolog. Il motivo di questa scelta è evidente se si considerano le definizioni dei metodi \textit{addTheory}, \textit{solve} e \textit{solveAll} presenti in \textit{Engine}: essi accettano rispettivamente \textit{PzValidation[Clause]*} e \textit{PzValidation[Fact]*} (invece di \textit{Clause*} e \textit{Fact*}).
 
@@ -64,6 +94,8 @@ Nella programmazione logica, una sostituzione è definita come una mappa finita 
 La politica di combinazione delle mappe offerta da Scalaz con l'implementazione di \textit{Monoid[Map]} non è adatta alle sostituzioni, perché le unisce semplicemente e sovrascrive i valori che compaiono più volte. Ad esempio, date due sostituzioni A=\{X/2,Y/X\} e B=\{X/3\}, si ottiene come risultato AB=\{Y/X,X/3\} mentre la sostituzione equivalente è AB=\{X/2,Y/3\}.
 
 Perciò è stata definita una nuova implementazione di \textit{Monoid[Substitution]}, in cui aggiungere una sostituzione ad un'altra equivale ad applicarla a tutti i termini nelle relazioni variabile/termine della prima sostituzione. In questo modo è sufficiente usare l'operatore |+| per unire le sostituzioni ma, affinché il procedimento funzioni, è necessario che la sostituzione inziale sia un'identità in cui ogni variabile presente nei goal è associata a sé stessa.
+
+\newpage
 
 \lstinputlisting[caption={Definizione di \textit{SubstitutionMonoid}, il metodo \textit{substitute} consente (utilizzando un implicito) di applicare una sostituzione ad una lista di termini}]{code/PrologSubstitution.scala}
 
